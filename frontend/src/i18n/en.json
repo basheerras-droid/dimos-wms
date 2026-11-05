@@ -1,0 +1,73 @@
+{
+  "app": {
+    "name": "DIMOS WMS",
+    "version": "Version {{version}}",
+    "loading": "Loading..."
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Warehouse Management System",
+    "username": "User name",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "failed": "Invalid user name or password.",
+    "locked": "This account is temporarily locked after too many failed attempts. Try again later or ask an administrator.",
+    "required": "Enter your user name and password.",
+    "network": "The server could not be reached. Check your connection and try again.",
+    "serverError": "Something went wrong on the server. Please try again."
+  },
+  "changePassword": {
+    "title": "Choose a new password",
+    "forced": "You must choose a new password before you can continue.",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Repeat new password",
+    "hint": "At least 12 characters, different from the current password.",
+    "submit": "Change password",
+    "submitting": "Saving...",
+    "tooShort": "The new password must have at least 12 characters.",
+    "mismatch": "The two new passwords are not the same.",
+    "wrongCurrent": "The current password is not correct.",
+    "same": "The new password must be different from the current one.",
+    "failed": "The password could not be changed. Please try again.",
+    "cancel": "Sign out"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "inbound": "Inbound",
+    "inventory": "Inventory",
+    "outbound": "Outbound",
+    "equipment": "Equipment (WCS)",
+    "reports": "Reports",
+    "administration": "Administration",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu"
+  },
+  "user": {
+    "menu": "User menu",
+    "role": "Role",
+    "changePassword": "Change password",
+    "logout": "Sign out"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {{name}}.",
+    "noData": "Live figures will appear here once the warehouse modules are connected.",
+    "kpi": {
+      "openTransportOrders": "Open transport orders",
+      "stockLocationsUsed": "Stock locations used",
+      "activeAlarms": "Active alarms",
+      "equipmentOnline": "Equipment online"
+    }
+  },
+  "placeholder": {
+    "title": "{{section}}",
+    "body": "This area is planned for a later release."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist.",
+    "back": "Back to dashboard"
+  }
+}

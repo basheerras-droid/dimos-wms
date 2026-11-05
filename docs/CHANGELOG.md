@@ -10,3 +10,7 @@
 - Step D3: session login (`/api/auth/login|logout|me|change-password`), lockout after 5 failures for 15 min, cookie CSRF,
   forced password change enforced on the server, audit of login/failure/lockout/logout/password change, correlation id
   per request, JSON error handler, no generated Spring password. `/actuator/health` public, rest of `/api` needs login.
+- Step D4: React + MUI front end (Metropolis font self-hosted, white top bar with the standard logo, Schwarzgrau text,
+  Blutorange accent only): login, forced change-password, collapsible side menu, dashboard with placeholder KPIs, i18next (en),
+  TanStack Query, React Router. Build into the JAR with `.\mvnw.cmd -Pfrontend clean package` (run in `backend/`).
+  Negative logo removed again from `frontend/public/brand/`.
