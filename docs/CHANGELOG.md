@@ -19,3 +19,4 @@
 - Step D5 done on WMS-TEST-SRV: self-signed certificate (D:\WMS\certs\wms-test.p12), firewall rule "DIMOS WMS HTTPS 8443"
   (inbound TCP 8443, Private/Domain, LocalSubnet), Windows service `dimos-wms` (WinSW 2.12.0, automatic start, restart on failure).
   HTTPS answers on localhost, 192.168.1.60 and WMS-TEST-SRV; PostgreSQL still listens on localhost only.
+- Fix: accounts without a password are refused but no longer count towards lockout (they could be locked by anyone before the first password existed).

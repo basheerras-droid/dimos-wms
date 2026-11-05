@@ -57,12 +57,14 @@ public class AuthService {
             audit(user, "LOGIN_FAILURE", "Account is locked until " + user.getLockedUntil(), remoteAddr);
             return new LoginResult(Status.LOCKED, null, user.getLockedUntil());
         }
-        boolean passwordOk = false;
-        if (user.getPasswordHash() != null) {
-            passwordOk = encoder.matches(password, user.getPasswordHash());
-        } else {
-            encoder.matches(password, dummyHash); // no password set yet: same timing, always a failure
+        if (user.getPasswordHash() == null) {
+            // No password set yet: always refuse (same timing), but do NOT count it towards lockout, otherwise
+            // anyone could lock an account just by trying before its first password exists.
+            encoder.matches(password, dummyHash);
+            audit(user, "LOGIN_FAILURE", "No password has been set for this account", remoteAddr);
+            return new LoginResult(Status.INVALID_CREDENTIALS, null, null);
         }
+        boolean passwordOk = encoder.matches(password, user.getPasswordHash());
         if (!passwordOk || !user.isEnabled()) {
             boolean locked = user.registerFailedLogin(maxAttempts, lockDuration, now);
             users.save(user);

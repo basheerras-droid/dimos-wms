@@ -105,7 +105,13 @@ class AuthServiceTests {
     @Test
     void userWithoutPasswordCannotLogIn() throws Exception {
         set(user, "passwordHash", null);
-        assertThat(service.login("admin", "anything", null).status()).isEqualTo(AuthService.Status.INVALID_CREDENTIALS);
+        for (int i = 0; i < 10; i++) {
+            assertThat(service.login("admin", "anything", null).status())
+                    .isEqualTo(AuthService.Status.INVALID_CREDENTIALS);
+        }
+        // never counted, never locked - otherwise anyone could lock the account before its first password exists
+        assertThat(user.getFailedAttempts()).isZero();
+        assertThat(user.getLockedUntil()).isNull();
     }
 
     @Test
