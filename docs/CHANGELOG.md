@@ -20,3 +20,4 @@
   (inbound TCP 8443, Private/Domain, LocalSubnet), Windows service `dimos-wms` (WinSW 2.12.0, automatic start, restart on failure).
   HTTPS answers on localhost, 192.168.1.60 and WMS-TEST-SRV; PostgreSQL still listens on localhost only.
 - Fix: accounts without a password are refused but no longer count towards lockout (they could be locked by anyone before the first password existed).
+- New passwords must have at least 8 characters (was 12), checked on the server and in the web page.

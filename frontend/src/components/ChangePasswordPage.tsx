@@ -32,7 +32,7 @@ export default function ChangePasswordPage() {
 
   function submit(ev: FormEvent) {
     ev.preventDefault()
-    if (next.length < 12) return setError(t('changePassword.tooShort'))
+    if (next.length < 8) return setError(t('changePassword.tooShort'))
     if (next !== repeat) return setError(t('changePassword.mismatch'))
     setError(null)
     change.mutate(

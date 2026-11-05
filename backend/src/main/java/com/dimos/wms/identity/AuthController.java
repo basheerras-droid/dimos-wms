@@ -30,7 +30,7 @@ class AuthController {
     }
 
     record ChangePasswordRequest(@NotBlank @Size(max = 200) String currentPassword,
-                                 @NotBlank @Size(min = 12, max = 128) String newPassword) {
+                                 @NotBlank @Size(min = 8, max = 128) String newPassword) {
     }
 
     record MeResponse(String username, String displayName, List<String> roles, boolean mustChangePassword) {
