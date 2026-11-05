@@ -4,11 +4,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "app_user")
@@ -64,7 +72,43 @@ public class AppUser {
     @Column(name = "updated_by", nullable = false)
     private String updatedBy;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<AppRole> roles = new HashSet<>();
+
     protected AppUser() {
+    }
+
+    public List<String> getRoleCodes() {
+        return roles.stream().map(AppRole::getCode).sorted().toList();
+    }
+
+    public boolean isLocked(Instant now) {
+        return lockedUntil != null && lockedUntil.isAfter(now);
+    }
+
+    /** Counts a failed login. Returns true if this failure locked the account. */
+    public boolean registerFailedLogin(int maxAttempts, Duration lockFor, Instant now) {
+        if (lockedUntil != null && !lockedUntil.isAfter(now)) { // an old lock has expired: start counting again
+            lockedUntil = null;
+            failedAttempts = 0;
+        }
+        failedAttempts++;
+        boolean lock = failedAttempts >= maxAttempts;
+        if (lock) {
+            lockedUntil = now.plus(lockFor);
+        }
+        touch("system");
+        return lock;
+    }
+
+    public void registerSuccessfulLogin(Instant now) {
+        failedAttempts = 0;
+        lockedUntil = null;
+        lastLoginAt = now;
+        touch(username);
     }
 
     public Long getId() { return id; }

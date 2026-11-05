@@ -7,3 +7,6 @@
   `audit_log` plus seed data (site DXB-TEST, 4 roles, users `admin` and `rasheed` as SUPER_ADMIN, no passwords yet).
 - Step D2: on startup, users without a password get one from env var WMS_INIT_PASSWORD_<USERNAME> (BCrypt via
   DelegatingPasswordEncoder, must change at first login, audited, never logged). New modules `audit` and `identity`.
+- Step D3: session login (`/api/auth/login|logout|me|change-password`), lockout after 5 failures for 15 min, cookie CSRF,
+  forced password change enforced on the server, audit of login/failure/lockout/logout/password change, correlation id
+  per request, JSON error handler, no generated Spring password. `/actuator/health` public, rest of `/api` needs login.
