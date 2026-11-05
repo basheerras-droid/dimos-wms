@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: dimos-wms
+  datasource:
+    url: jdbc:postgresql://localhost:5432/wms_dev?currentSchema=wms
+    username: wms_app
+    password: ${WMS_DB_APP_PASSWORD}
+  flyway:
+    user: wms_owner
+    password: ${WMS_DB_OWNER_PASSWORD}
+    schemas: wms
+    default-schema: wms
+    locations: classpath:db/migration/common,classpath:db/migration/postgresql
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
