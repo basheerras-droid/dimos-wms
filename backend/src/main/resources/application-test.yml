@@ -1,0 +1,10 @@
+# Profile "test": the server on WMS-TEST-SRV (HTTPS on 8443). No secrets here - they come from machine environment
+# variables: WMS_KEYSTORE_PASSWORD (certificate), WMS_DB_OWNER_PASSWORD / WMS_DB_APP_PASSWORD (database).
+server:
+  port: 8443
+  ssl:
+    enabled: true
+    key-store: ${WMS_KEYSTORE_PATH:file:D:/WMS/certs/wms-test.p12}
+    key-store-type: PKCS12
+    key-store-password: ${WMS_KEYSTORE_PASSWORD}
+    key-alias: wms-test

@@ -14,3 +14,5 @@
   Blutorange accent only): login, forced change-password, collapsible side menu, dashboard with placeholder KPIs, i18next (en),
   TanStack Query, React Router. Build into the JAR with `.\mvnw.cmd -Pfrontend clean package` (run in `backend/`).
   Negative logo removed again from `frontend/public/brand/`.
+- Step D5 (part 1): profile `test` (HTTPS 8443, keystore from env), WinSW service definition and step-by-step `deploy/README.md`.
+  Certificate, firewall rule and service install are done on the server after approval (not in Git).

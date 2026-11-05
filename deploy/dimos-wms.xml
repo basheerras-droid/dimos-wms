@@ -1,0 +1,32 @@
+<!--
+  WinSW service definition for the DIMOS WMS backend.
+  Install: copy WinSW's exe to D:\WMS\tools\dimos-wms.exe and this file next to it as dimos-wms.xml (same base name).
+  See deploy\README.md. Secrets are NOT stored here: the service reads the machine environment variables
+  WMS_DB_OWNER_PASSWORD, WMS_DB_APP_PASSWORD and WMS_KEYSTORE_PASSWORD.
+-->
+<service>
+  <id>dimos-wms</id>
+  <name>DIMOS WMS</name>
+  <description>DIMOS Warehouse Management System (Spring Boot, HTTPS 8443)</description>
+
+  <executable>C:\Program Files\Eclipse Adoptium\jdk-25.0.5.8-hotspot\bin\java.exe</executable>
+  <arguments>-Xmx1g -jar D:\WMS\app\wms-backend.jar</arguments>
+  <workingdirectory>D:\WMS\app</workingdirectory>
+  <env name="SPRING_PROFILES_ACTIVE" value="test"/>
+
+  <startmode>Automatic</startmode>
+  <depend>postgresql-x64-18</depend>
+
+  <logpath>D:\WMS\logs</logpath>
+  <log mode="roll-by-size">
+    <sizeThreshold>10240</sizeThreshold>
+    <keepFiles>8</keepFiles>
+  </log>
+
+  <!-- restart on failure: after 10 s, 30 s, then every 60 s; failure counter resets after one hour of running -->
+  <onfailure action="restart" delay="10 sec"/>
+  <onfailure action="restart" delay="30 sec"/>
+  <onfailure action="restart" delay="60 sec"/>
+  <resetfailure>1 hour</resetfailure>
+  <stoptimeout>30 sec</stoptimeout>
+</service>
