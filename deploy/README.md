@@ -43,3 +43,5 @@ Start-Service dimos-wms
 ```
 Logs: `D:\WMS\logs\dimos-wms.out.log` / `.err.log` (WinSW) .
 Update later: `Stop-Service dimos-wms`, copy the new JAR, `Start-Service dimos-wms`.
+
+WinSW used on WMS-TEST-SRV: v2.12.0 (WinSW-x64.exe, SHA256 05B82D46AD331CC16BDC00DE5C6332C1EF818DF8CEEFCD49C726553209B3A0DA; the release is not code-signed).

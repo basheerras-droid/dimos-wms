@@ -16,3 +16,6 @@
   Negative logo removed again from `frontend/public/brand/`.
 - Step D5 (part 1): profile `test` (HTTPS 8443, keystore from env), WinSW service definition and step-by-step `deploy/README.md`.
   Certificate, firewall rule and service install are done on the server after approval (not in Git).
+- Step D5 done on WMS-TEST-SRV: self-signed certificate (D:\WMS\certs\wms-test.p12), firewall rule "DIMOS WMS HTTPS 8443"
+  (inbound TCP 8443, Private/Domain, LocalSubnet), Windows service `dimos-wms` (WinSW 2.12.0, automatic start, restart on failure).
+  HTTPS answers on localhost, 192.168.1.60 and WMS-TEST-SRV; PostgreSQL still listens on localhost only.
