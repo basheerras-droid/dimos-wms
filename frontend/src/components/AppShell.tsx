@@ -1,8 +1,10 @@
 import LogoutIcon from '@mui/icons-material/Logout'
 import MenuIcon from '@mui/icons-material/Menu'
 import KeyIcon from '@mui/icons-material/Key'
+import ExpandLess from '@mui/icons-material/ExpandLess'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 import {
-  AppBar, Avatar, Box, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText,
+  AppBar, Avatar, Box, Collapse, Divider, Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText,
   Menu, MenuItem, Toolbar, Tooltip, Typography, useMediaQuery,
 } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
@@ -11,7 +13,7 @@ import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router'
 import { useLogout, useMe } from '../api/auth'
 import { brand } from '../theme'
-import { navItems } from './navItems'
+import { navItems, type NavItem } from './navItems'
 
 const WIDE = 232
 const NARROW = 64
@@ -27,6 +29,7 @@ export default function AppShell() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({})
 
   if (me.isLoading) return null
   if (!me.data) return <Navigate to="/login" replace />
@@ -36,34 +39,61 @@ export default function AppShell() {
   const width = compact ? WIDE : collapsed ? NARROW : WIDE
   const showText = compact || !collapsed
 
+  const allowed = (item: NavItem) => !item.permission || user.permissions.includes(item.permission)
+  const isOn = (path: string) => (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path))
+
+  const renderItem = (item: NavItem, depth: number) => {
+    const group = item.children !== undefined
+    const selected = item.path !== undefined && isOn(item.path)
+    const open = group && (openGroups[item.key] ?? selected)
+    const target = group ? item.children![0]?.path : item.path
+    const button = (
+      <ListItemButton
+        key={item.key}
+        selected={selected && !group}
+        onClick={() => {
+          if (group && showText) {
+            setOpenGroups((g) => ({ ...g, [item.key]: !open }))
+            return
+          }
+          if (target) navigate(target)
+          setMobileOpen(false)
+        }}
+        sx={{ minHeight: depth ? 40 : 48, px: 2.5, pl: depth ? 6.5 : 2.5 }}
+      >
+        {item.icon && (
+          <ListItemIcon sx={{ minWidth: 0, mr: showText ? 2 : 0, color: selected ? brand.blutorange : brand.schwarzgrau }}>
+            {item.icon}
+          </ListItemIcon>
+        )}
+        {showText && (
+          <ListItemText
+            primary={t(`nav.${item.key}`)}
+            slotProps={{ primary: { sx: { fontWeight: selected ? 600 : 500, color: brand.schwarzgrau, fontSize: depth ? 14 : undefined } } }}
+          />
+        )}
+        {group && showText && (open ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />)}
+      </ListItemButton>
+    )
+    const wrapped = showText ? button : (
+      <Tooltip key={item.key} title={t(`nav.${item.key}`)} placement="right">{button}</Tooltip>
+    )
+    if (!group) return wrapped
+    return (
+      <Box key={item.key}>
+        {wrapped}
+        {showText && (
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <List disablePadding>{item.children!.filter(allowed).map((c) => renderItem(c, depth + 1))}</List>
+          </Collapse>
+        )}
+      </Box>
+    )
+  }
+
   const list = (
     <Box sx={{ pt: 1 }}>
-      <List>
-        {navItems.map((item) => {
-          const selected = item.path === '/' ? location.pathname === '/' : location.pathname.startsWith(item.path)
-          const button = (
-            <ListItemButton
-              key={item.key}
-              selected={selected}
-              onClick={() => {
-                navigate(item.path)
-                setMobileOpen(false)
-              }}
-              sx={{ minHeight: 48, px: 2.5 }}
-            >
-              <ListItemIcon sx={{ minWidth: 0, mr: showText ? 2 : 0, color: selected ? brand.blutorange : brand.schwarzgrau }}>
-                {item.icon}
-              </ListItemIcon>
-              {showText && <ListItemText primary={t(`nav.${item.key}`)} slotProps={{ primary: { sx: { fontWeight: selected ? 600 : 500, color: brand.schwarzgrau } } }} />}
-            </ListItemButton>
-          )
-          return showText ? button : (
-            <Tooltip key={item.key} title={t(`nav.${item.key}`)} placement="right">
-              {button}
-            </Tooltip>
-          )
-        })}
-      </List>
+      <List>{navItems.filter(allowed).map((item) => renderItem(item, 0))}</List>
     </Box>
   )
 

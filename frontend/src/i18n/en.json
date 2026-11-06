@@ -41,6 +41,10 @@
     "equipment": "Equipment (WCS)",
     "reports": "Reports",
     "administration": "Administration",
+    "masterdata": "Master data",
+    "areas": "Areas",
+    "locationTypes": "Location types",
+    "huTypes": "Handling-unit types",
     "collapse": "Collapse menu",
     "expand": "Expand menu"
   },
@@ -59,6 +63,95 @@
       "stockLocationsUsed": "Stock locations used",
       "activeAlarms": "Active alarms",
       "equipmentOnline": "Equipment online"
+    }
+  },
+  "md": {
+    "search": "Search code or name",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "add": "Add",
+    "edit": "Edit",
+    "view": "View",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "close": "Close",
+    "reload": "Reload",
+    "columns": "Choose columns",
+    "export": "Export",
+    "exportCsv": "Download CSV",
+    "exportXlsx": "Download Excel (XLSX)",
+    "noRows": "No records found.",
+    "deleted": "The record was deleted.",
+    "deleteTitle": "Delete this record?",
+    "deleteText": "{{name}} will be deleted. This cannot be undone.",
+    "requiredHint": "Fields marked * are required.",
+    "error": {
+      "required": "This field is required.",
+      "notInteger": "Enter a whole number.",
+      "notNumber": "Enter a number.",
+      "min": "Must be at least {{min}}.",
+      "validation": "Please correct the marked fields.",
+      "stale": "This record was changed by someone else - reload",
+      "inUse": "This record is still used by other records and cannot be deleted.",
+      "notFound": "This record no longer exists.",
+      "forbidden": "You do not have permission for this.",
+      "session": "Your session has ended. Please sign in again.",
+      "server": "Something went wrong on the server. Please try again.",
+      "network": "The server could not be reached. Check your connection and try again."
+    },
+    "help": {
+      "code": "Letters, digits, _ . - ; stored in capitals; unique.",
+      "storage": "Handling units are stored here.",
+      "transfer": "A hand-over position between pieces of equipment.",
+      "capacityHu": "How many handling units fit on one location of this type.",
+      "container": "Other handling units can be placed in or on this type."
+    },
+    "areaTypes": {
+      "INBOUND": "Inbound",
+      "STORAGE": "Storage",
+      "OUTBOUND": "Outbound",
+      "BUFFER": "Buffer",
+      "WORKSTATION": "Work station",
+      "TRANSPORT": "Transport"
+    },
+    "fields": {
+      "code": "Code",
+      "name": "Name",
+      "areaType": "Area type",
+      "storage": "Storage",
+      "transfer": "Transfer",
+      "workstation": "Work station",
+      "capacityHu": "Capacity (HU)",
+      "lengthMm": "Length (mm)",
+      "widthMm": "Width (mm)",
+      "heightMm": "Height (mm)",
+      "tareKg": "Tare (kg)",
+      "maxGrossKg": "Max. gross (kg)",
+      "container": "Container"
+    },
+    "areas": {
+      "title": "Areas",
+      "add": "New area",
+      "new": "New area",
+      "edit": "Edit area",
+      "view": "Area"
+    },
+    "locationTypes": {
+      "title": "Location types",
+      "add": "New location type",
+      "new": "New location type",
+      "edit": "Edit location type",
+      "view": "Location type"
+    },
+    "huTypes": {
+      "title": "Handling-unit types",
+      "add": "New handling-unit type",
+      "new": "New handling-unit type",
+      "edit": "Edit handling-unit type",
+      "view": "Handling-unit type"
     }
   },
   "placeholder": {

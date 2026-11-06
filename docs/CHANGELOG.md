@@ -34,6 +34,11 @@
   with no path to an outbound location, location types accepting no HU type (ERROR when used), HU types accepted nowhere,
   equipment without locations, a location claimed by two equipment of the same type, locations at the same position/level,
   locations without x/y. Measured: 20 001 locations + 39 998 links in 215 ms.
+- Step E5.1 (front end): collapsible "Master data" menu group (shown only with MASTERDATA_VIEW, route guard too);
+  generic list page with MUI DataGrid community 9.17.0 (MIT): server paging/sorting/search/filters, column chooser, CSV/XLSX
+  export, side drawer for create/edit/view with required marks, server errors next to the field, the 409 "changed by someone
+  else - reload" message with a Reload button, delete with confirmation. Screens: Areas, Location types, HU types. Edit buttons
+  appear only with MASTERDATA_EDIT. `/api/auth/me` permissions are used by the UI (`useCan`).
 - Flyway V5: four more built-in equipment types (ETV, MONORAIL, TURNTABLE, WASHER; 17 in total). CLAUDE.md now lists the three
   reference projects (EKFC, DFC, INL).
 

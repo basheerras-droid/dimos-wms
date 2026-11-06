@@ -5,6 +5,7 @@ export interface Me {
   username: string
   displayName: string
   roles: string[]
+  permissions: string[]
   mustChangePassword: boolean
 }
 
@@ -25,6 +26,12 @@ export function useMe() {
     retry: false,
     staleTime: 60_000,
   })
+}
+
+/** True if the logged-in user has the permission (e.g. MASTERDATA_EDIT). The server checks again on every call. */
+export function useCan(permission: string): boolean {
+  const me = useMe()
+  return me.data?.permissions?.includes(permission) ?? false
 }
 
 export function useLogin() {
