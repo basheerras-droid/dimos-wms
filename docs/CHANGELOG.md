@@ -39,6 +39,8 @@
   export, side drawer for create/edit/view with required marks, server errors next to the field, the 409 "changed by someone
   else - reload" message with a Reload button, delete with confirmation. Screens: Areas, Location types, HU types. Edit buttons
   appear only with MASTERDATA_EDIT. `/api/auth/me` permissions are used by the UI (`useCan`).
+- UI: dark side navigation (Schwarzgrau panel, text #E8EAEC, sub-items #B9BEC2, selected = 4 px Blutorange bar + rgba(215,44,6,0.18)
+  background + white text, hover #3A4047). Colours are theme tokens (`palette.nav`). Contrast checked: all text at least 5.6:1.
 - Flyway V5: four more built-in equipment types (ETV, MONORAIL, TURNTABLE, WASHER; 17 in total). CLAUDE.md now lists the three
   reference projects (EKFC, DFC, INL).
 

@@ -18,6 +18,13 @@ import { navItems, type NavItem } from './navItems'
 const WIDE = 232
 const NARROW = 64
 
+/** Dark panel for the side navigation only (other drawers, e.g. the edit drawer, stay white). */
+const navPaper = {
+  backgroundColor: 'nav.background',
+  color: 'nav.text',
+  borderRight: 0,
+} as const
+
 export default function AppShell() {
   const { t } = useTranslation()
   const theme = useTheme()
@@ -50,7 +57,7 @@ export default function AppShell() {
     const button = (
       <ListItemButton
         key={item.key}
-        selected={selected && !group}
+        selected={selected && (!group || !showText)}
         onClick={() => {
           if (group && showText) {
             setOpenGroups((g) => ({ ...g, [item.key]: !open }))
@@ -59,17 +66,39 @@ export default function AppShell() {
           if (target) navigate(target)
           setMobileOpen(false)
         }}
-        sx={{ minHeight: depth ? 40 : 48, px: 2.5, pl: depth ? 6.5 : 2.5 }}
+        sx={(th) => ({
+          minHeight: depth ? 40 : 48,
+          px: 2.5,
+          pl: depth ? 6.5 : 2.5,
+          position: 'relative',
+          color: depth ? th.palette.nav.subText : th.palette.nav.text,
+          '&:hover': { backgroundColor: th.palette.nav.hover },
+          '&.Mui-focusVisible': { outline: `2px solid ${th.palette.nav.text}`, outlineOffset: -2 },
+          '&.Mui-selected': {
+            backgroundColor: th.palette.nav.selectedBackground,
+            color: th.palette.nav.selectedText,
+            '&:hover': { backgroundColor: th.palette.nav.selectedBackground },
+            // 4 px accent bar on the left; drawn on top so the text does not move when an item is selected
+            '&::before': {
+              content: '""', position: 'absolute', left: 0, top: 0, bottom: 0, width: 4,
+              backgroundColor: th.palette.nav.accent,
+            },
+          },
+        })}
       >
         {item.icon && (
-          <ListItemIcon sx={{ minWidth: 0, mr: showText ? 2 : 0, color: selected ? brand.blutorange : brand.schwarzgrau }}>
+          <ListItemIcon
+            sx={(th) => ({
+              minWidth: 0, mr: showText ? 2 : 0, color: selected ? th.palette.nav.selectedText : th.palette.nav.icon,
+            })}
+          >
             {item.icon}
           </ListItemIcon>
         )}
         {showText && (
           <ListItemText
             primary={t(`nav.${item.key}`)}
-            slotProps={{ primary: { sx: { fontWeight: selected ? 600 : 500, color: brand.schwarzgrau, fontSize: depth ? 14 : undefined } } }}
+            slotProps={{ primary: { sx: { fontWeight: selected ? 600 : 500, color: 'inherit', fontSize: depth ? 14 : undefined } } }}
           />
         )}
         {group && showText && (open ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />)}
@@ -139,12 +168,12 @@ export default function AppShell() {
       </AppBar>
 
       {compact ? (
-        <Drawer variant="temporary" open={mobileOpen} onClose={() => setMobileOpen(false)} ModalProps={{ keepMounted: true }} sx={{ '& .MuiDrawer-paper': { width: WIDE } }}>
+        <Drawer variant="temporary" open={mobileOpen} onClose={() => setMobileOpen(false)} ModalProps={{ keepMounted: true }} sx={{ '& .MuiDrawer-paper': { ...navPaper, width: WIDE } }}>
           <Toolbar />
           {list}
         </Drawer>
       ) : (
-        <Drawer variant="permanent" sx={{ width, flexShrink: 0, '& .MuiDrawer-paper': { width, boxSizing: 'border-box', overflowX: 'hidden', transition: 'width 150ms' } }}>
+        <Drawer variant="permanent" sx={{ width, flexShrink: 0, '& .MuiDrawer-paper': { ...navPaper, width, boxSizing: 'border-box', overflowX: 'hidden', transition: 'width 150ms' } }}>
           <Toolbar />
           {list}
         </Drawer>

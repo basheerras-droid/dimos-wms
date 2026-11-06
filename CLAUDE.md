@@ -55,6 +55,8 @@ English, work in small steps, and tell him which machine each manual step runs o
 - Logo: use ONLY `frontend/public/brand/dimos-logo.png` (the original logo), always on a white or light
   background. Never stretch or recolour it, never put it on a dark or busy background; keep clear space
   around it at least the height of the lettering.
+- Side navigation is dark Schwarzgrau (#2F3339) with light text; selected item = 4px Blutorange bar + red-tinted background.
+  Colours live in the theme (`palette.nav`), never hard-coded in components. Text contrast at least 4.5:1.
 - App top bar is WHITE with the logo. Schwarzgrau #2F3339 is for text and headings; Blutorange #D72C06 is only
   the accent.
 - English only in version 1, but ALL user-visible text goes through i18next translation files (`frontend/src/i18n/`).
