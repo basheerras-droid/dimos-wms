@@ -257,8 +257,8 @@ class MasterDataApiTests {
         // 17 built-in types are listed (13 from V4, 4 from V5)
         String list = mvc.perform(get(BASE + "/equipment-types").with(authentication(VIEWER))).andReturn()
                 .getResponse().getContentAsString();
-        assertThat((List<?>) JsonPath.read(list, "$[?(@.seeded == true)]")).hasSize(17);
-        long conveyor = ((Number) ((List<?>) JsonPath.read(list, "$[?(@.code == 'CONVEYOR')].id")).get(0)).longValue();
+        assertThat((List<?>) JsonPath.read(list, "$.items[?(@.seeded == true)]")).hasSize(17);
+        long conveyor = ((Number) ((List<?>) JsonPath.read(list, "$.items[?(@.code == 'CONVEYOR')].id")).get(0)).longValue();
 
         // only SUPER_ADMIN can add, change or delete
         String body = "{\"code\":\"" + unique("TT") + "\",\"name\":\"Tugger train\"}";
@@ -284,7 +284,7 @@ class MasterDataApiTests {
         long loc = id(createLocation(unique("L"), area, type));
         String types = mvc.perform(get(BASE + "/equipment-types").with(authentication(VIEWER))).andReturn()
                 .getResponse().getContentAsString();
-        long hoistType = ((Number) ((List<?>) JsonPath.read(types, "$[?(@.code == 'HOIST')].id")).get(0)).longValue();
+        long hoistType = ((Number) ((List<?>) JsonPath.read(types, "$.items[?(@.code == 'HOIST')].id")).get(0)).longValue();
 
         String parent = send(post(BASE + "/equipment"), ADMIN, "{\"code\":\"" + unique("EQ")
                 + "\",\"name\":\"Line\",\"equipmentTypeId\":" + hoistType + ",\"areaId\":" + area + "}", 201);
@@ -301,6 +301,7 @@ class MasterDataApiTests {
         String assigned = send(put(BASE + "/equipment/" + id(child) + "/locations"), ADMIN,
                 "{\"locationIds\":[" + loc + "]}", 200);
         assertThat((List<?>) JsonPath.read(assigned, "$.ids")).hasSize(1);
+        assertThat((List<?>) JsonPath.read(assigned, "$.items[*].code")).hasSize(1); // codes for the screen
         send(put(BASE + "/equipment/" + id(child) + "/locations"), ADMIN, "{\"locationIds\":[999999]}", 400);
 
         // deleting equipment removes its location assignments
@@ -327,6 +328,7 @@ class MasterDataApiTests {
         String allowed = send(put(BASE + "/location-types/" + type + "/hu-types"), ADMIN,
                 "{\"huTypeIds\":[" + pallet + "," + uld + "]}", 200);
         assertThat((List<?>) JsonPath.read(allowed, "$.ids")).hasSize(2);
+        assertThat((List<?>) JsonPath.read(allowed, "$.items[*].name")).hasSize(2);
         mvc.perform(get(BASE + "/location-types/" + type + "/hu-types").with(authentication(VIEWER)))
                 .andExpect(jsonPath("$.ids.length()").value(2));
     }

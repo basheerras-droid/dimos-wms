@@ -50,7 +50,9 @@
     "collapse": "Collapse menu",
     "expand": "Expand menu",
     "locations": "Locations",
-    "locationLinks": "Location links"
+    "locationLinks": "Location links",
+    "equipmentMaster": "Equipment",
+    "equipmentTypes": "Equipment types"
   },
   "user": {
     "menu": "User menu",
@@ -122,7 +124,10 @@
       "extAttributes": "Project-specific extra fields as JSON text, e.g. {\"zone\":\"cold\"}.",
       "huTypeEmpty": "Leave empty if the link is valid for all handling-unit types.",
       "linkEquipment": "The equipment that performs the move (optional).",
-      "cost": "Routing cost; routes with the lowest total cost are preferred."
+      "cost": "Routing cost; routes with the lowest total cost are preferred.",
+      "parentEquipment": "Optional: the equipment this one belongs to, e.g. a conveyor line that contains transfer units.",
+      "plcConnection": "Connection details for the PLC (used in a later phase).",
+      "equipmentEnabled": "A disabled piece of equipment is not used for transport."
     },
     "areaTypes": {
       "INBOUND": "Inbound",
@@ -174,7 +179,14 @@
       "huTypeCode": "Handling-unit type",
       "equipmentId": "Equipment",
       "equipmentCode": "Equipment",
-      "cost": "Cost"
+      "cost": "Cost",
+      "equipmentTypeId": "Equipment type",
+      "equipmentTypeCode": "Equipment type",
+      "parentId": "Part of (parent equipment)",
+      "parentCode": "Part of",
+      "plcConnection": "PLC connection",
+      "kind": "Kind",
+      "maxQty": "Max. quantity"
     },
     "areas": {
       "title": "Areas",
@@ -226,6 +238,46 @@
       "edit": "Edit link",
       "view": "Link",
       "search": "Search from / to location code"
+    },
+    "equipment": {
+      "title": "Equipment",
+      "add": "New equipment",
+      "new": "New equipment",
+      "edit": "Edit equipment",
+      "view": "Equipment"
+    },
+    "equipmentTypes": {
+      "title": "Equipment types",
+      "add": "New equipment type",
+      "new": "New equipment type",
+      "edit": "Edit equipment type",
+      "view": "Equipment type",
+      "builtIn": "Built-in",
+      "custom": "Custom",
+      "builtInHint": "Built-in types are fixed and cannot be changed or deleted.",
+      "helpSuper": "Built-in types are fixed. You can add your own types and change or delete them.",
+      "helpOthers": "The list of equipment types is shared by all projects. Only a super administrator can add types."
+    },
+    "assign": {
+      "huTypesAction": "Allowed handling-unit types",
+      "huTypesTitle": "Allowed handling-unit types",
+      "huTypesHelp": "Tick the handling-unit types that may be placed on locations of this location type.",
+      "selectedCount": "{{count}} selected",
+      "locationsAction": "Locations of this equipment",
+      "locationsTitle": "Locations of the equipment",
+      "locationsHelp": "Add locations one by one, or add all locations of an area and/or matching a text at once. Nothing is saved until you press Save.",
+      "addOne": "Add a location (type to search)",
+      "matchText": "Code or name contains",
+      "addMatching": "Add all matching",
+      "tooManyMatches": "{{count}} locations match - narrow the search (at most {{max}} at once).",
+      "addedCount": "{{added}} added ({{found}} matched).",
+      "assignedCount": "{{count}} assigned",
+      "removeSelected": "Remove selected ({{count}})",
+      "noneAssigned": "No locations assigned.",
+      "placedInAction": "May be placed in / on",
+      "placedInTitle": "May be placed in / on",
+      "placedInHelp": "Tick the handling-unit types that {{code}} may be placed in or on (for example a carton on a pallet). Optionally limit the quantity per carrier.",
+      "badQty": "The maximum quantity must be a whole number of at least 1, or empty for no limit."
     }
   },
   "placeholder": {

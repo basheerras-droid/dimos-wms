@@ -40,9 +40,14 @@ class EquipmentTypeService {
     }
 
     @Transactional(readOnly = true)
-    public List<Response> list(String q) {
+    public PageResult<Response> list(String q, int page, int size) {
         Specification<EquipmentType> spec = Specs.all(Specs.<EquipmentType>search(q, "code", "name"));
-        return repository.findAll(spec, Sort.by("code")).stream().map(EquipmentTypeService::toResponse).toList();
+        List<Response> all = repository.findAll(spec, Sort.by("code")).stream()
+                .map(EquipmentTypeService::toResponse).toList();
+        int pageSize = Math.min(Math.max(size, 1), MasterDataService.MAX_PAGE_SIZE);
+        int from = (int) Math.min((long) Math.max(page, 0) * pageSize, all.size());
+        return new PageResult<>(all.subList(from, Math.min(from + pageSize, all.size())), all.size(),
+                Math.max(page, 0), pageSize);
     }
 
     @Transactional(readOnly = true)

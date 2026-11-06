@@ -8,7 +8,10 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import SettingsIcon from '@mui/icons-material/Settings'
 import type { ReactElement } from 'react'
 import EntityPage from './masterdata/EntityPage'
-import { areasConfig, huTypesConfig, locationLinksConfig, locationsConfig, locationTypesConfig } from './masterdata/configs'
+import EquipmentTypesPage from './masterdata/EquipmentTypesPage'
+import {
+  areasConfig, equipmentConfig, huTypesConfig, locationLinksConfig, locationsConfig, locationTypesConfig,
+} from './masterdata/configs'
 
 export interface NavItem {
   key: string
@@ -39,6 +42,9 @@ export const navItems: NavItem[] = [
       { key: 'locations', path: '/masterdata/locations', element: <EntityPage config={locationsConfig} /> },
       { key: 'locationLinks', path: '/masterdata/location-links', element: <EntityPage config={locationLinksConfig} /> },
       { key: 'huTypes', path: '/masterdata/hu-types', element: <EntityPage config={huTypesConfig} /> },
+      // static configuration of the equipment; the top-level "Equipment (WCS)" entry is for live status (later step)
+      { key: 'equipmentMaster', path: '/masterdata/equipment', element: <EntityPage config={equipmentConfig} /> },
+      { key: 'equipmentTypes', path: '/masterdata/equipment-types', element: <EquipmentTypesPage /> },
     ],
   },
   { key: 'reports', path: '/reports', icon: <AssessmentIcon /> },

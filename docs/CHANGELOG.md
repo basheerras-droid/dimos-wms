@@ -50,6 +50,14 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Step E5.3: Master data -> Equipment (static configuration; the top-level "Equipment (WCS)" entry stays for live status in
+  Step F/H) with list, filters (type, area, enabled) and drawer (type, area, parent equipment, PLC connection, external reference,
+  extra attributes); Equipment types screen (built-in types shown with a lock, read-only; custom types can be added, renamed and
+  deleted by SUPER_ADMIN only); three assignment editors opened from a button on the row: equipment -> locations (add one by one,
+  or add all locations of an area / matching a text, max 5 000 at once, remove selected, nothing saved until Save), location type ->
+  allowed handling-unit types, HU type -> types it may be placed in / on (with optional max quantity; loops are refused by the
+  server). Backend: assignment endpoints now also return code and name of each assigned record; equipment list shows the parent code;
+  the equipment-types list uses the same paged shape as all other lists.
 - Step E5.2 (front end): Locations screen (all fields, filters area / location type / level / enabled / blocked, hidden-by-default
   columns for position, weight, reason; tick several rows and block / unblock inbound or outbound, enable or disable them in one
   go, with a reason dialog when blocking, max 1 000 rows) and Location links screen (from / to location chosen by searching the

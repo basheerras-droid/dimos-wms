@@ -42,7 +42,14 @@ class AssignmentService {
     record NestingList(@NotNull @Size(max = 1000) List<@Valid Nesting> placedIn, Long version) {
     }
 
-    record Ids(List<Long> ids, long version) {
+    /** A record in an assignment list, with its code and name so the screen can show it. */
+    record Item(Long id, String code, String name) {
+    }
+
+    record Ids(List<Long> ids, long version, List<Item> items) {
+        static Ids of(List<Item> items, long version) {
+            return new Ids(items.stream().map(Item::id).toList(), version, items);
+        }
     }
 
     private final JdbcTemplate jdbc;
@@ -69,9 +76,9 @@ class AssignmentService {
     @Transactional(readOnly = true)
     public Ids huTypesOfLocationType(Long locationTypeId, WmsUserPrincipal who) {
         LocationType t = ownedLocationType(locationTypeId, who);
-        return new Ids(jdbc.queryForList(
-                "select hu_type_id from location_type_hu_type where location_type_id = ? order by hu_type_id",
-                Long.class, t.id), t.version);
+        return Ids.of(jdbc.query("select h.id, h.code, h.name from location_type_hu_type x "
+                + "join hu_type h on h.id = x.hu_type_id where x.location_type_id = ? order by h.code",
+                (rs, i) -> new Item(rs.getLong(1), rs.getString(2), rs.getString(3)), t.id), t.version);
     }
 
     @Transactional
@@ -88,7 +95,7 @@ class AssignmentService {
         t.stamp(who.username());
         locationTypes.saveAndFlush(t);
         record("ASSIGN_HU_TYPES", "location_type", t.id, before, new ArrayList<>(wanted), who);
-        return new Ids(new ArrayList<>(wanted), t.version);
+        return huTypesOfLocationType(locationTypeId, who);
     }
 
     // ---- equipment -> locations -------------------------------------------------------------------------
@@ -96,9 +103,9 @@ class AssignmentService {
     @Transactional(readOnly = true)
     public Ids locationsOfEquipment(Long equipmentId, WmsUserPrincipal who) {
         Equipment e = ownedEquipment(equipmentId, who);
-        return new Ids(jdbc.queryForList(
-                "select location_id from equipment_location where equipment_id = ? order by location_id",
-                Long.class, e.id), e.version);
+        return Ids.of(jdbc.query("select l.id, l.code, l.name from equipment_location x "
+                + "join location l on l.id = x.location_id where x.equipment_id = ? order by l.code",
+                (rs, i) -> new Item(rs.getLong(1), rs.getString(2), rs.getString(3)), e.id), e.version);
     }
 
     @Transactional
@@ -114,7 +121,7 @@ class AssignmentService {
         e.stamp(who.username());
         equipment.saveAndFlush(e);
         record("ASSIGN_LOCATIONS", "equipment", e.id, before, new ArrayList<>(wanted), who);
-        return new Ids(new ArrayList<>(wanted), e.version);
+        return locationsOfEquipment(equipmentId, who);
     }
 
     // ---- handling-unit type -> types it may be placed in ------------------------------------------------

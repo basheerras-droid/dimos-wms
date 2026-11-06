@@ -29,7 +29,7 @@ class EquipmentService extends MasterDataService<Equipment, EquipmentService.Req
     }
 
     record Response(Long id, String code, String name, Long equipmentTypeId, String equipmentTypeCode, Long areaId,
-                    String areaCode, Long parentId, String plcConnection, boolean enabled, String externalRef,
+                    String areaCode, Long parentId, String parentCode, String plcConnection, boolean enabled, String externalRef,
                     String extAttributes, long version, Instant updatedAt, String updatedBy) {
     }
 
@@ -99,7 +99,7 @@ class EquipmentService extends MasterDataService<Equipment, EquipmentService.Req
     Response toResponse(Equipment e) {
         return new Response(e.id, e.code, e.name, e.equipmentType.id, e.equipmentType.code,
                 e.area == null ? null : e.area.id, e.area == null ? null : e.area.code,
-                e.parent == null ? null : e.parent.id, e.plcConnection, e.enabled, e.externalRef, e.extAttributes,
+                e.parent == null ? null : e.parent.id, e.parent == null ? null : e.parent.code, e.plcConnection, e.enabled, e.externalRef, e.extAttributes,
                 e.version, e.updatedAt, e.updatedBy);
     }
 

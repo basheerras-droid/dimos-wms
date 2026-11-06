@@ -1,4 +1,10 @@
+import LayersIcon from '@mui/icons-material/Layers'
+import PlaceIcon from '@mui/icons-material/PlaceOutlined'
+import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck'
 import { MD } from '../../api/masterdata'
+import HuTypesOfLocationTypeDialog from './assignments/HuTypesOfLocationTypeDialog'
+import LocationsOfEquipmentDialog from './assignments/LocationsOfEquipmentDialog'
+import PlacedInDialog from './assignments/PlacedInDialog'
 import type { EntityConfig } from './types'
 
 const AREA_TYPES = ['INBOUND', 'STORAGE', 'OUTBOUND', 'BUFFER', 'WORKSTATION', 'TRANSPORT']
@@ -44,6 +50,9 @@ export const locationTypesConfig: EntityConfig = {
     { name: 'capacityHu', type: 'integer', min: 0, helpKey: 'md.help.capacityHu' },
   ],
   defaults: { code: '', name: '', storage: false, transfer: false, workstation: false, capacityHu: '1' },
+  rowActions: [
+    { key: 'huTypes', labelKey: 'md.assign.huTypesAction', icon: <PlaylistAddCheckIcon fontSize="small" />, dialog: HuTypesOfLocationTypeDialog },
+  ],
 }
 
 export const locationsConfig: EntityConfig = {
@@ -176,4 +185,47 @@ export const huTypesConfig: EntityConfig = {
   defaults: {
     code: '', name: '', lengthMm: '', widthMm: '', heightMm: '', tareKg: '', maxGrossKg: '', container: false,
   },
+  rowActions: [
+    { key: 'placedIn', labelKey: 'md.assign.placedInAction', icon: <LayersIcon fontSize="small" />, dialog: PlacedInDialog },
+  ],
+}
+
+export const equipmentConfig: EntityConfig = {
+  key: 'equipment',
+  path: `${MD}/equipment`,
+  exportType: 'equipment',
+  defaultSort: 'code,asc',
+  columns: [
+    { field: 'code', width: 170, sortable: true },
+    { field: 'name', flex: 1, sortable: true },
+    { field: 'equipmentTypeCode', width: 170 },
+    { field: 'areaCode', width: 130 },
+    { field: 'parentCode', width: 150 },
+    { field: 'enabled', type: 'boolean', width: 100, sortable: true },
+    { field: 'plcConnection', width: 180, hiddenByDefault: true },
+    { field: 'externalRef', width: 160, hiddenByDefault: true },
+  ],
+  fields: [
+    { name: 'code', type: 'text', required: true, maxLength: 50, helpKey: 'md.help.code' },
+    { name: 'name', type: 'text', required: true, maxLength: 100 },
+    { name: 'equipmentTypeId', type: 'ref', required: true, refPath: `${MD}/equipment-types`, displayField: 'equipmentTypeCode' },
+    { name: 'areaId', type: 'ref', refPath: `${MD}/areas`, displayField: 'areaCode' },
+    { name: 'parentId', type: 'ref', refPath: `${MD}/equipment`, displayField: 'parentCode', helpKey: 'md.help.parentEquipment' },
+    { name: 'plcConnection', type: 'text', maxLength: 255, helpKey: 'md.help.plcConnection' },
+    { name: 'enabled', type: 'boolean', helpKey: 'md.help.equipmentEnabled' },
+    { name: 'externalRef', type: 'text', maxLength: 100, helpKey: 'md.help.externalRef' },
+    { name: 'extAttributes', type: 'multiline', maxLength: 4000, helpKey: 'md.help.extAttributes' },
+  ],
+  filters: [
+    { name: 'equipmentTypeId', type: 'ref', refPath: `${MD}/equipment-types` },
+    { name: 'areaId', type: 'ref', refPath: `${MD}/areas` },
+    { name: 'enabled', type: 'boolean' },
+  ],
+  defaults: {
+    code: '', name: '', equipmentTypeId: '', areaId: '', parentId: '', plcConnection: '', enabled: true,
+    externalRef: '', extAttributes: '',
+  },
+  rowActions: [
+    { key: 'locations', labelKey: 'md.assign.locationsAction', icon: <PlaceIcon fontSize="small" />, dialog: LocationsOfEquipmentDialog },
+  ],
 }

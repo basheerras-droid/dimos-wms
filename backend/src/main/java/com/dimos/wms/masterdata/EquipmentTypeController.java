@@ -32,8 +32,10 @@ class EquipmentTypeController {
 
     @GetMapping
     @PreAuthorize(MasterDataController.VIEW)
-    List<EquipmentTypeService.Response> list(@RequestParam(required = false) String q) {
-        return service.list(q);
+    PageResult<EquipmentTypeService.Response> list(@RequestParam(required = false) String q,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "200") int size) {
+        return service.list(q, page, size);
     }
 
     @GetMapping("/{id}")

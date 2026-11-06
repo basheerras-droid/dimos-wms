@@ -21,7 +21,7 @@ import { api, apiDownload } from '../../api/client'
 import { MD, useDeleteRecord, useMasterList, useOptions, type ListParams } from '../../api/masterdata'
 import EntityDrawer from './EntityDrawer'
 import { errorText } from './errorText'
-import type { BulkAction, EntityConfig, FilterDef, Row } from './types'
+import type { BulkAction, EntityConfig, FilterDef, Row, RowAction } from './types'
 
 function GridToolbar() {
   const { t } = useTranslation()
@@ -64,6 +64,7 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
   const [target, setTarget] = useState<Row | 'new' | null>(null)
   const [toDelete, setToDelete] = useState<Row | null>(null)
   const [notice, setNotice] = useState<{ text: string; severity: 'success' | 'error' } | null>(null)
+  const [activeAction, setActiveAction] = useState<{ action: RowAction; row: Row } | null>(null)
   const [exportAnchor, setExportAnchor] = useState<HTMLElement | null>(null)
   const [selection, setSelection] = useState<GridRowSelectionModel>(EMPTY_SELECTION)
   const [bulkAsk, setBulkAsk] = useState<BulkAction | null>(null)
@@ -107,13 +108,20 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
     cols.push({
       field: '__actions',
       headerName: '',
-      width: 96,
+      width: 96 + 40 * (config.rowActions?.length ?? 0),
       sortable: false,
       filterable: false,
       disableColumnMenu: true,
       hideable: false,
       renderCell: (p: GridRenderCellParams<Row>) => (
         <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          {config.rowActions?.map((a) => (
+            <Tooltip key={a.key} title={t(a.labelKey)}>
+              <IconButton size="small" aria-label={t(a.labelKey)} onClick={() => setActiveAction({ action: a, row: p.row })}>
+                {a.icon}
+              </IconButton>
+            </Tooltip>
+          ))}
           <Tooltip title={canEdit ? t('md.edit') : t('md.view')}>
             <IconButton size="small" aria-label={canEdit ? t('md.edit') : t('md.view')} onClick={() => setTarget(p.row)}>
               {canEdit ? <EditIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
@@ -286,6 +294,10 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
           sx={{ border: 0 }}
         />
       </Paper>
+
+      {activeAction && (
+        <activeAction.action.dialog row={activeAction.row} canEdit={canEdit} onClose={() => setActiveAction(null)} />
+      )}
 
       <EntityDrawer config={config} target={target} canEdit={canEdit} onClose={() => setTarget(null)} />
 

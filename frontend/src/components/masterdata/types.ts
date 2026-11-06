@@ -1,3 +1,4 @@
+import type { ComponentType, ReactElement } from 'react'
 import type { Versioned } from '../../api/masterdata'
 
 export type FieldType = 'text' | 'multiline' | 'integer' | 'decimal' | 'boolean' | 'select' | 'ref'
@@ -55,6 +56,15 @@ export interface BulkAction {
   needsReason?: boolean
 }
 
+/** An extra button on every row that opens a dialog for that row (e.g. "assign locations"). */
+export interface RowAction {
+  key: string
+  /** i18n key of the tooltip. */
+  labelKey: string
+  icon: ReactElement
+  dialog: ComponentType<{ row: Row; canEdit: boolean; onClose: () => void }>
+}
+
 /** Everything the generic list + drawer needs to manage one master-data table. */
 export interface EntityConfig {
   /** i18n namespace under `md.`, e.g. "areas" -> md.areas.title */
@@ -71,6 +81,7 @@ export interface EntityConfig {
   rowLabel?: (row: Row) => string
   /** Select several rows and apply one action to all of them. */
   bulk?: { path: string; actions: BulkAction[]; max: number }
+  rowActions?: RowAction[]
   /** Placeholder of the search box, i18n key (default md.search). */
   searchKey?: string
 }
