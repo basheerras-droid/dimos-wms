@@ -50,6 +50,11 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Import: a CSV that mixes separators (e.g. TAB in the header, commas in the rows) now gives ONE file-level message ("The header
+  row uses TAB but row 2 uses comma - use one separator in the whole file.") instead of one confusing error per row. Every problem
+  with the file as a whole (wrong type, empty, too many rows, unreadable, mixed separators) is now shown that way in the check
+  result (and Apply is refused with 422) instead of an error page. The CSV template uses commas (UTF-8 with byte-order mark so
+  Excel shows special characters); uploads accept comma, semicolon or TAB, detected from the header row.
 - Step E5.5: **Administration -> Users** and **Audit log** (group shown when the user has USER_MANAGE and/or AUDIT_VIEW).
   Users (`/api/admin/users`, permission USER_MANAGE): list with search / status / role filters, create, edit display name, e-mail,
   roles, enable / disable, unlock, reset password. The administrator never chooses or sees a real password: a random 12-character

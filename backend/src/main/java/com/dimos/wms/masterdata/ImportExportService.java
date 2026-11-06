@@ -64,7 +64,12 @@ class ImportExportService {
 
     public Result process(String key, String filename, byte[] data, boolean dryRun, WmsUserPrincipal who) {
         ImportDefinition d = importers.get(key);
-        Table table = TableReader.read(filename, data);
+        Table table;
+        try {
+            table = TableReader.read(filename, data);
+        } catch (ImportFileException ex) { // the file as a whole is unusable: one clear message, no rows
+            return new Result(key, dryRun, false, 0, 0, 0, 0, 1, false, List.of(ex.getMessage()), List.of());
+        }
         List<String> fileErrors = checkHeaders(d, table);
         if (!fileErrors.isEmpty()) {
             return new Result(key, dryRun, false, 0, 0, 0, 0, fileErrors.size(), false, fileErrors, List.of());

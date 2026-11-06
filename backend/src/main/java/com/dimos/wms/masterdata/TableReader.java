@@ -34,7 +34,7 @@ final class TableReader {
     static Table read(String filename, byte[] data) {
         String name = filename == null ? "" : filename.toLowerCase();
         if (data == null || data.length == 0) {
-            throw MasterDataException.invalid("file", "the file is empty");
+            throw new ImportFileException("The file is empty.");
         }
         try {
             if (name.endsWith(".xlsx")) {
@@ -43,13 +43,13 @@ final class TableReader {
             if (name.endsWith(".csv") || name.endsWith(".txt")) {
                 return readCsv(data);
             }
-        } catch (MasterDataException ex) {
+        } catch (ImportFileException ex) {
             throw ex;
         } catch (IOException | RuntimeException ex) {
-            throw MasterDataException.invalid("file", "the file could not be read (" + ex.getClass().getSimpleName()
+            throw new ImportFileException("The file could not be read (" + ex.getClass().getSimpleName()
                     + "). Use a .csv or .xlsx file made from the template.");
         }
-        throw MasterDataException.invalid("file", "use a .csv or .xlsx file");
+        throw new ImportFileException("Use a .csv or .xlsx file.");
     }
 
     // ---- CSV ---------------------------------------------------------------------------------------------
@@ -59,7 +59,8 @@ final class TableReader {
         if (text.startsWith("﻿")) {
             text = text.substring(1);
         }
-        CSVFormat format = CSVFormat.DEFAULT.builder().setDelimiter(detectDelimiter(text)).setIgnoreEmptyLines(true)
+        char delimiter = detectDelimiter(text);
+        CSVFormat format = CSVFormat.DEFAULT.builder().setDelimiter(delimiter).setIgnoreEmptyLines(true)
                 .setTrim(true).get();
         List<String> headers = null;
         List<Table.Line> lines = new ArrayList<>();
@@ -73,6 +74,7 @@ final class TableReader {
                     throw tooMany();
                 }
                 List<String> cells = record.toList();
+                checkSeparator(delimiter, headers.size(), cells, (int) record.getRecordNumber());
                 Map<String, String> values = new LinkedHashMap<>();
                 boolean any = false;
                 for (int i = 0; i < headers.size(); i++) {
@@ -86,6 +88,27 @@ final class TableReader {
             }
         }
         return new Table(headers == null ? List.of() : headers, lines);
+    }
+
+    /**
+     * A header with several columns but a row that stayed in a single cell, which itself contains another separator,
+     * means the file mixes separators (e.g. TAB in the header, commas in the rows). One clear message instead of one
+     * confusing error per row.
+     */
+    private static void checkSeparator(char headerDelimiter, int headerColumns, List<String> cells, int row) {
+        if (headerColumns < 2 || cells.size() != 1) {
+            return;
+        }
+        for (char other : new char[] {',', ';', '\t'}) {
+            if (other != headerDelimiter && cells.get(0).indexOf(other) >= 0) {
+                throw new ImportFileException("The header row uses " + nameOf(headerDelimiter) + " but row " + row
+                        + " uses " + nameOf(other) + " - use one separator in the whole file.");
+            }
+        }
+    }
+
+    private static String nameOf(char delimiter) {
+        return delimiter == '\t' ? "TAB" : delimiter == ';' ? "semicolon" : "comma";
     }
 
     /** UTF-8 (with or without BOM); files saved by older Excel versions are Windows-1252. */
@@ -168,7 +191,7 @@ final class TableReader {
         return cell == null ? "" : formatter.formatCellValue(cell, evaluator).trim();
     }
 
-    private static MasterDataException tooMany() {
-        return MasterDataException.invalid("file", "too many rows (maximum " + MAX_ROWS + " per file)");
+    private static ImportFileException tooMany() {
+        return new ImportFileException("Too many rows (maximum " + MAX_ROWS + " per file).");
     }
 }

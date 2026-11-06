@@ -193,8 +193,48 @@ class ImportExportTests {
         assertThat((String) JsonPath.read(unknown, "$.fileErrors[0]")).startsWith("Unknown column 'colour'");
         String missing = csvImport("areas", "code,name\nZT-A,x\n", true, 200);
         assertThat((String) JsonPath.read(missing, "$.fileErrors[0]")).isEqualTo("Required column 'area_type' is missing.");
-        upload("areas", "data.pdf", "x".getBytes(), true, ADMIN, 400);
-        upload("areas", "data.csv", new byte[0], true, ADMIN, 400);
+        // a file that cannot be used at all is a file-level message, not an error page
+        String pdf = upload("areas", "data.pdf", "x".getBytes(), true, ADMIN, 200).getResponse().getContentAsString();
+        assertThat((String) JsonPath.read(pdf, "$.fileErrors[0]")).isEqualTo("Use a .csv or .xlsx file.");
+        String empty = upload("areas", "data.csv", new byte[0], true, ADMIN, 200).getResponse().getContentAsString();
+        assertThat((String) JsonPath.read(empty, "$.fileErrors[0]")).isEqualTo("The file is empty.");
+        // applying such a file is refused
+        upload("areas", "data.pdf", "x".getBytes(), false, ADMIN, 422);
+    }
+
+    @Test
+    void mixedSeparatorsGiveOneClearFileMessage() throws Exception {
+        String tabHeaderCommaRows = "code\tname\tarea_type\nZT-A,Alpha,STORAGE\nZT-B,Beta,STORAGE\n";
+        String r1 = csvImport("areas", tabHeaderCommaRows, true, 200);
+        assertThat((List<String>) JsonPath.read(r1, "$.fileErrors")).containsExactly(
+                "The header row uses TAB but row 2 uses comma - use one separator in the whole file.");
+        assertThat((List<?>) JsonPath.read(r1, "$.rows")).isEmpty(); // no per-row errors
+        assertThat(number(r1, "$.errors")).isEqualTo(1);
+
+        String commaHeaderSemicolonRows = "code,name,area_type\nZT-A;Alpha;STORAGE\n";
+        String r2 = csvImport("areas", commaHeaderSemicolonRows, true, 200);
+        assertThat((List<String>) JsonPath.read(r2, "$.fileErrors")).containsExactly(
+                "The header row uses comma but row 2 uses semicolon - use one separator in the whole file.");
+
+        // applying is refused and nothing is written
+        csvImport("areas", tabHeaderCommaRows, false, 422);
+        assertThat(count("area")).isZero();
+
+        // consistent files of every kind still work
+        assertThat(number(csvImport("areas", "code\tname\tarea_type\nZT-T\tTab\tSTORAGE\n", true, 200), "$.created")).isEqualTo(1);
+        assertThat(number(csvImport("areas", "code;name;area_type\nZT-S;Semi;STORAGE\n", true, 200), "$.created")).isEqualTo(1);
+        // commas inside quotes are not a second separator
+        assertThat(number(csvImport("areas", "code,name,area_type\nZT-Q,\"Hall 1, north\",STORAGE\n", true, 200), "$.created")).isEqualTo(1);
+    }
+
+    @Test
+    void theTemplateUsesCommasAndAUtf8ByteOrderMark() throws Exception {
+        byte[] bytes = mvc.perform(get(BASE + "/import/areas/template").with(authentication(VIEWER)))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsByteArray();
+        assertThat(bytes[0] & 0xFF).isEqualTo(0xEF); // UTF-8 BOM so Excel shows special characters
+        String text = new String(bytes, StandardCharsets.UTF_8).substring(1);
+        assertThat(text.lines().findFirst().orElse("")).isEqualTo("code,name,area_type");
+        assertThat(text).doesNotContain("\t").doesNotContain(";");
     }
 
     @Test
