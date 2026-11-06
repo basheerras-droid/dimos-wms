@@ -86,6 +86,31 @@ Menu changes (all text through i18n, brand rules from CLAUDE.md):
   - Possible extra validator rule (E4 follow-up): two locations with the same aisle + side + column_no + level_no.
 - Import screen: choose entity -> download template -> upload -> dry-run result table -> Apply.
 
+## E5.7 - Administration extended (owner's request, 2026-11-07)
+Status: tables proposed in `docs/design/E5.7-administration-tables.md`; no code before the owner says OK.
+Common rules: every new business table has `site_id`, `version`, audit columns; portable SQL in `common/`; every change
+is written to the audit log.
+1. **Permissions**: catalogue fixed in code (code + module + description), read-only screen grouped by module.
+   New permissions: ROLE_MANAGE, WORKSTATION_MANAGE, PARAMETER_VIEW, PARAMETER_EDIT.
+2. **Roles**: built-in roles locked; custom roles can be created, copied, edited and deleted; screen = tick matrix
+   (roles x permissions). Only SUPER_ADMIN edits roles.
+3. **User groups**: members + roles; users inherit the roles of their groups; a user may be in several groups and also
+   have direct roles; effective rights = union. The user drawer shows the effective permissions. Prepare (do not build)
+   the mapping to LDAP / AD groups.
+4. **Workstations**: code, name, type (PC, HANDHELD, HMI, KIOSK), location (master-data location), workstation group,
+   optional host name / IP, default printer (text for now), enabled. Browser registration: an administrator registers
+   a browser as a workstation once (random token kept in the browser, only a hash in the database); optional IP check.
+   An unregistered browser = office mode. The current workstation is shown in the top bar.
+5. **Workstation groups**: optional list of allowed permissions; effective rights = user rights AND the workstation
+   group's allowed list (empty list = no restriction). Enforced on the server.
+6. **Parameters**: `parameter_definition` seeded by Flyway (code, type INT / BOOL / TEXT / CHOICE / DURATION, default,
+   min, max, allowed scopes, restart needed, description) and `parameter_value` per scope GLOBAL / SITE / WS_GROUP /
+   WORKSTATION; the most specific value wins. Screen: list with the effective value and where it comes from; edit with
+   validation; every change audited. Seed: session timeout, password minimum length, lockout attempts, lockout
+   minutes, audit retention days. The existing lockout and session settings read these parameters.
+Tests: inheritance via group; a workstation restriction blocks MASTERDATA_EDIT at a shop-floor workstation;
+parameter override order; a built-in role cannot be changed.
+
 ## E6 - Demo project data (product/project separation)
 - Create folder `projects/demo/masterdata/` with CSV files for a small generic demo plant (no customer data):
   1 site, areas INBOUND / STORAGE / OUTBOUND, an inbound conveyor line of 6 locations, one hoist serving 3 levels,
