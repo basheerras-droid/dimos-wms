@@ -32,8 +32,11 @@ class EquipmentTypeService {
     private final EquipmentTypeRepository repository;
     private final AuditService audit;
     private final JsonMapper json;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
 
-    EquipmentTypeService(EquipmentTypeRepository repository, AuditService audit, JsonMapper json) {
+    EquipmentTypeService(EquipmentTypeRepository repository, AuditService audit, JsonMapper json,
+                         org.springframework.jdbc.core.JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
         this.repository = repository;
         this.audit = audit;
         this.json = json;
@@ -95,6 +98,11 @@ class EquipmentTypeService {
             throw MasterDataException.forbidden("A built-in equipment type cannot be deleted.");
         }
         Response before = toResponse(t);
+        Integer used = jdbc.queryForObject("select count(*) from equipment where equipment_type_id = ?", Integer.class, t.id);
+        if (used != null && used > 0) {
+            throw MasterDataException.inUse("Equipment type " + t.code + " cannot be deleted: it is still used by " + used
+                    + (used == 1 ? " piece of equipment" : " pieces of equipment") + ". Change their type first.");
+        }
         try {
             repository.delete(t);
             repository.flush();

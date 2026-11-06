@@ -85,6 +85,52 @@ public class AppUser {
         return roles.stream().map(AppRole::getCode).sorted().toList();
     }
 
+    // ---- user administration ---------------------------------------------------------------------------
+
+    /** A new account. It has no usable password until the caller sets one; the user must change it at first login. */
+    static AppUser create(Long siteId, String username, String displayName, String email, String passwordHash,
+                          Set<AppRole> roles, String actor) {
+        AppUser u = new AppUser();
+        Instant now = Instant.now();
+        u.siteId = siteId;
+        u.username = username;
+        u.displayName = displayName;
+        u.email = email;
+        u.passwordHash = passwordHash;
+        u.mustChangePassword = true;
+        u.enabled = true;
+        u.roles = new HashSet<>(roles);
+        u.createdAt = now;
+        u.createdBy = actor;
+        u.updatedAt = now;
+        u.updatedBy = actor;
+        return u;
+    }
+
+    void updateAccount(String displayName, String email, boolean enabled, Set<AppRole> newRoles, String actor) {
+        this.displayName = displayName;
+        this.email = email;
+        this.enabled = enabled;
+        this.roles.clear();
+        this.roles.addAll(newRoles);
+        touch(actor);
+    }
+
+    /** Clears failed attempts and the temporary lock. */
+    void unlock(String actor) {
+        this.failedAttempts = 0;
+        this.lockedUntil = null;
+        touch(actor);
+    }
+
+    boolean hasRole(String code) {
+        return roles.stream().anyMatch(r -> r.getCode().equals(code));
+    }
+
+    public long getVersion() { return version; }
+    public Instant getUpdatedAt() { return updatedAt; }
+    public String getUpdatedBy() { return updatedBy; }
+
     public List<String> getPermissionCodes() {
         return roles.stream().flatMap(r -> r.getPermissions().stream()).map(AppPermission::getCode).distinct()
                 .sorted().toList();

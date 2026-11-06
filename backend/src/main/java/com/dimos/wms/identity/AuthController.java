@@ -49,7 +49,10 @@ class AuthController {
     private final SecurityContextRepository contextRepository;
     private final SecurityContextHolderStrategy holder = SecurityContextHolder.getContextHolderStrategy();
 
-    AuthController(AuthService auth, SecurityContextRepository contextRepository) {
+    private final UserSessions sessions;
+
+    AuthController(AuthService auth, SecurityContextRepository contextRepository, UserSessions sessions) {
+        this.sessions = sessions;
         this.auth = auth;
         this.contextRepository = contextRepository;
     }
@@ -124,5 +127,6 @@ class AuthController {
         context.setAuthentication(token);
         holder.setContext(context);
         contextRepository.saveContext(context, request, response);
+        sessions.register(principal.userId(), request.getSession());
     }
 }

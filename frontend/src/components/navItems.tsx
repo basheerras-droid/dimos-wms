@@ -7,6 +7,8 @@ import MoveToInboxIcon from '@mui/icons-material/MoveToInbox'
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing'
 import SettingsIcon from '@mui/icons-material/Settings'
 import type { ReactElement } from 'react'
+import AuditPage from './admin/AuditPage'
+import UsersPage from './admin/UsersPage'
 import EntityPage from './masterdata/EntityPage'
 import EquipmentTypesPage from './masterdata/EquipmentTypesPage'
 import ImportPage from './masterdata/ImportPage'
@@ -52,7 +54,16 @@ export const navItems: NavItem[] = [
     ],
   },
   { key: 'reports', path: '/reports', icon: <AssessmentIcon /> },
-  { key: 'administration', path: '/administration', icon: <SettingsIcon /> },
+  {
+    key: 'administration',
+    path: '/administration',
+    icon: <SettingsIcon />,
+    // each page needs its own permission; the group shows when at least one of them is allowed
+    children: [
+      { key: 'users', path: '/administration/users', permission: 'USER_MANAGE', element: <UsersPage key="users" /> },
+      { key: 'auditLog', path: '/administration/audit', permission: 'AUDIT_VIEW', element: <AuditPage key="audit" /> },
+    ],
+  },
 ]
 
 /** Every page of the menu as a flat list (for the router). */

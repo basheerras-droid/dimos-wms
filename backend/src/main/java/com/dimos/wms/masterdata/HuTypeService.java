@@ -78,6 +78,21 @@ class HuTypeService extends MasterDataService<HuType, HuTypeService.Request, HuT
     }
 
     @Override
+    java.util.List<Usage> usages() {
+        return java.util.List.of(
+                new Usage("location link", "location links", "select count(*) from location_link where hu_type_id = ?"),
+                new Usage("nesting rule where it is the carrier", "nesting rules where it is the carrier",
+                        "select count(*) from hu_type_nesting where outer_hu_type_id = ?"),
+                new Usage("location type that accepts it", "location types that accept it",
+                        "select count(*) from location_type_hu_type where hu_type_id = ?"));
+    }
+
+    @Override
+    String displayName(HuType h) {
+        return "Handling-unit type " + h.code;
+    }
+
+    @Override
     Set<String> sortFields() {
         return Set.of("id", "code", "name", "lengthMm", "widthMm", "heightMm", "updatedAt");
     }

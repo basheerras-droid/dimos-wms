@@ -56,6 +56,18 @@ class AreaService extends MasterDataService<Area, AreaService.Request, AreaServi
     }
 
     @Override
+    java.util.List<Usage> usages() {
+        return java.util.List.of(
+                new Usage("location", "locations", "select count(*) from location where area_id = ?"),
+                new Usage("piece of equipment", "pieces of equipment", "select count(*) from equipment where area_id = ?"));
+    }
+
+    @Override
+    String displayName(Area a) {
+        return "Area " + a.code;
+    }
+
+    @Override
     Set<String> sortFields() {
         return Set.of("id", "code", "name", "areaType", "updatedAt");
     }

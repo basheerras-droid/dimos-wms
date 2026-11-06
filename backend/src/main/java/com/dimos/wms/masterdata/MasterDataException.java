@@ -32,6 +32,11 @@ class MasterDataException extends RuntimeException {
                 "This record was changed by someone else - reload", List.of());
     }
 
+    /** The record cannot be deleted because other records use it; the message says which ones. */
+    static MasterDataException inUse(String message) {
+        return new MasterDataException(HttpStatus.CONFLICT, "IN_USE", message, List.of());
+    }
+
     static MasterDataException inUse() {
         return new MasterDataException(HttpStatus.CONFLICT, "IN_USE",
                 "This record is still used by other records and cannot be deleted.", List.of());

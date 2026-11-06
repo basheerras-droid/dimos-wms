@@ -50,6 +50,25 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Step E5.5: **Administration -> Users** and **Audit log** (group shown when the user has USER_MANAGE and/or AUDIT_VIEW).
+  Users (`/api/admin/users`, permission USER_MANAGE): list with search / status / role filters, create, edit display name, e-mail,
+  roles, enable / disable, unlock, reset password. The administrator never chooses or sees a real password: a random 12-character
+  temporary password is generated and shown once (never stored readable, never in the audit log, answer is `no-store`); the user
+  must change it at the next login. Rules: only SUPER_ADMIN can create / change / reset a SUPER_ADMIN or give that role; nobody can
+  disable themselves, change their own roles or reset their own password here; at least one enabled SUPER_ADMIN must remain;
+  user names are fixed; stale edits get the 409 "changed by someone else" message. Disabling a user or resetting a password
+  signs the user out at once (open sessions are tracked per user). Audit actions: USER_CREATED, USER_UPDATED, USER_ENABLED,
+  USER_DISABLED, USER_PASSWORD_RESET, USER_UNLOCKED (before/after = user name, display name, e-mail, enabled, roles only).
+  Audit log (`/api/admin/audit`, permission AUDIT_VIEW): newest first, filters user / action / table / record id / text (also
+  searches the before and after values) / from-to date-time, paging, click a row for the full details with before and after values
+  side by side. The audit module only exposes a query service (no dependency on identity).
+- Clearer "still used" message: deleting a record that others use now says what is in the way, e.g. "Equipment TEST-CONV cannot be
+  deleted: it is still used by 1 piece of sub-equipment (it is their parent). Remove or change those first." (areas, location types,
+  HU types, locations, equipment, equipment types). Checked before the delete, because the database aborts the transaction otherwise.
+- Fix: the Equipment list answered HTTP 500 for some sort orders ("Code, descending", ...) when a piece of equipment was listed
+  after its sub-equipment: the lazily loaded parent was a Hibernate placeholder whose fields read as empty. The parent is now loaded
+  normally. Found by `ListEndpointsTests` on real data; regression test added. Also: `ResponseStatusException` (e.g. an unreadable
+  date) is answered with its own status (400) instead of 500.
 - Step E5.4 (front end): Master data -> **Import** (needs MASTERDATA_EDIT): choose the table (listed in load order), download the
   template (CSV/Excel) or the current data, see what each column means, upload a file and "Check file" (dry run: counts of new /
   update / add / unchanged / errors, per-row table with an "only errors" switch, file-level problems such as unknown or missing

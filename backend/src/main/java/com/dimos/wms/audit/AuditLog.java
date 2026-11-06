@@ -54,6 +54,19 @@ class AuditLog {
     protected AuditLog() {
     }
 
+    Long getId() { return id; }
+    Long getSiteId() { return siteId; }
+    Instant getOccurredAt() { return occurredAt; }
+    String getActor() { return actor; }
+    String getAction() { return action; }
+    String getEntityType() { return entityType; }
+    String getEntityId() { return entityId; }
+    String getBeforeValue() { return beforeValue; }
+    String getAfterValue() { return afterValue; }
+    String getDetail() { return detail; }
+    String getRemoteAddr() { return remoteAddr; }
+    String getCorrelationId() { return correlationId; }
+
     AuditLog(AuditEvent e, Instant now) {
         this.siteId = e.siteId();
         this.occurredAt = now;

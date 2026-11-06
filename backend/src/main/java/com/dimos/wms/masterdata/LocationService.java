@@ -117,6 +117,22 @@ class LocationService extends MasterDataService<Location, LocationService.Reques
     }
 
     @Override
+    java.util.List<Usage> usages() {
+        return java.util.List.of(
+                new Usage("link that starts here", "links that start here",
+                        "select count(*) from location_link where from_location_id = ?"),
+                new Usage("link that ends here", "links that end here",
+                        "select count(*) from location_link where to_location_id = ?"),
+                new Usage("piece of equipment it is assigned to", "pieces of equipment it is assigned to",
+                        "select count(*) from equipment_location where location_id = ?"));
+    }
+
+    @Override
+    String displayName(Location l) {
+        return "Location " + l.code;
+    }
+
+    @Override
     Set<String> sortFields() {
         return Set.of("id", "code", "name", "levelNo", "aisle", "columnNo", "rowNo", "enabled", "updatedAt");
     }

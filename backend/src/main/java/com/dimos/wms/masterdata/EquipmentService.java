@@ -104,6 +104,19 @@ class EquipmentService extends MasterDataService<Equipment, EquipmentService.Req
     }
 
     @Override
+    java.util.List<Usage> usages() {
+        return java.util.List.of(
+                new Usage("piece of sub-equipment (it is their parent)", "pieces of sub-equipment (it is their parent)",
+                        "select count(*) from equipment where parent_id = ?"),
+                new Usage("location link", "location links", "select count(*) from location_link where equipment_id = ?"));
+    }
+
+    @Override
+    String displayName(Equipment e) {
+        return "Equipment " + e.code;
+    }
+
+    @Override
     Set<String> sortFields() {
         return Set.of("id", "code", "name", "enabled", "updatedAt");
     }

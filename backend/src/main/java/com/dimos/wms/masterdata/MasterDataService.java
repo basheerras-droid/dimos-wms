@@ -3,8 +3,11 @@ package com.dimos.wms.masterdata;
 import com.dimos.wms.audit.AuditEvent;
 import com.dimos.wms.audit.AuditService;
 import com.dimos.wms.identity.WmsUserPrincipal;
+import java.util.List;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -26,6 +29,9 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
     private static final int AUDIT_MAX = 4000;
 
     private final SiteRepository<E> repository;
+
+    @Autowired
+    private JdbcTemplate usageJdbc;
     protected final AuditService audit;
     protected final JsonMapper json;
 
@@ -50,6 +56,23 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
 
     String defaultSort() {
         return "code";
+    }
+
+    /**
+     * Something that can stop a record from being deleted: {@code countSql} counts the records that use it, with one
+     * parameter, the id. The labels are used in the message, e.g. "3 locations".
+     */
+    record Usage(String singular, String plural, String countSql) {
+    }
+
+    /** What other records may use this one (default: nothing is checked, the database still protects it). */
+    List<Usage> usages() {
+        return List.of();
+    }
+
+    /** How the record is called in messages (default: its id). */
+    String displayName(E entity) {
+        return String.valueOf(entity.getId());
     }
 
     /** Called before a record is deleted, to remove rows that only belong to it. */
@@ -112,6 +135,11 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
     public void delete(Long id, WmsUserPrincipal who) {
         E entity = load(id, who);
         R before = toResponse(entity);
+        String blockers = blockers(entity);
+        if (blockers != null) { // say what is in the way (asked first: after a failed delete the transaction is unusable)
+            throw MasterDataException.inUse(displayName(entity) + " cannot be deleted: it is still used by " + blockers
+                    + ". Remove or change those first.");
+        }
         try {
             beforeDelete(entity);
             repository.delete(entity);
@@ -123,6 +151,22 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
     }
 
     // ---- helpers for subclasses -----------------------------------------------------------------------
+
+    /** "3 locations and 1 piece of equipment", or null when nothing uses the record. */
+    private String blockers(E entity) {
+        List<String> parts = new java.util.ArrayList<>();
+        for (Usage u : usages()) {
+            Integer n = usageJdbc.queryForObject(u.countSql(), Integer.class, entity.getId());
+            if (n != null && n > 0) {
+                parts.add(n + " " + (n == 1 ? u.singular() : u.plural()));
+            }
+        }
+        if (parts.isEmpty()) {
+            return null;
+        }
+        return parts.size() == 1 ? parts.get(0)
+                : String.join(", ", parts.subList(0, parts.size() - 1)) + " and " + parts.get(parts.size() - 1);
+    }
 
     protected void flush() {
         repository.flush();

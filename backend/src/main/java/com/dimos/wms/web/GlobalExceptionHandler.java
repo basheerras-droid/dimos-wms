@@ -11,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /** One JSON error shape for the whole API. Stack traces go to the log, never to the browser. */
@@ -32,6 +33,17 @@ class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ApiError> unreadable(HttpMessageNotReadableException ex) {
         return body(HttpStatus.BAD_REQUEST, "BAD_REQUEST", "The request body could not be read.", List.of());
+    }
+
+    /** A deliberate "this request is wrong" (e.g. an unreadable date): keep its status instead of answering 500. */
+    @ExceptionHandler(ResponseStatusException.class)
+    ResponseEntity<ApiError> status(ResponseStatusException ex) {
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+        if (status == null || status.is5xxServerError()) {
+            return unexpected(ex);
+        }
+        String reason = ex.getReason() == null ? "The request is not valid." : ex.getReason();
+        return body(status, status == HttpStatus.BAD_REQUEST ? "BAD_REQUEST" : status.name(), reason, List.of());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

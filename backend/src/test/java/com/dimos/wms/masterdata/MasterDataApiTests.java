@@ -197,6 +197,14 @@ class MasterDataApiTests {
 
         String inUse = send(delete(BASE + "/areas/" + area), ADMIN, null, 409);
         assertThat((String) JsonPath.read(inUse, "$.code")).isEqualTo("IN_USE");
+        // the message says what is in the way
+        assertThat((String) JsonPath.read(inUse, "$.message")).startsWith("Area ").contains("cannot be deleted")
+                .contains("still used by 2 locations");
+        // a location that is the end of a link says so
+        long hub = id(createLocation(unique("LH"), area, type));
+        send(post(BASE + "/location-links"), ADMIN, "{\"fromLocationId\":" + loc1 + ",\"toLocationId\":" + hub + "}", 201);
+        String linked = send(delete(BASE + "/locations/" + hub), ADMIN, null, 409);
+        assertThat((String) JsonPath.read(linked, "$.message")).contains("1 link that ends here");
     }
 
     @Test
@@ -292,6 +300,15 @@ class MasterDataApiTests {
         String child = send(post(BASE + "/equipment"), ADMIN, "{\"code\":\"" + unique("EC")
                 + "\",\"name\":\"Child\",\"equipmentTypeId\":" + hoistType + ",\"parentId\":" + parentId + "}", 201);
 
+        // listing parent and child in either order works and shows the parent's code (this used to answer HTTP 500
+        // when the child was read before its parent)
+        String parentCode = JsonPath.read(parent, "$.code");
+        for (String order : List.of("code,asc", "code,desc", "name,desc", "id,desc", "updatedAt,asc")) {
+            String listed = send(get(BASE + "/equipment?size=200&sort=" + order), ADMIN, null, 200);
+            assertThat(JsonPath.<List<String>>read(listed, "$.items[?(@.id == " + id(child) + ")].parentCode"))
+                    .containsExactly(parentCode);
+        }
+
         // the parent cannot be placed inside its own child
         String loop = send(put(BASE + "/equipment/" + parentId), ADMIN, "{\"code\":\"" + JsonPath.read(parent, "$.code")
                 + "\",\"name\":\"Line\",\"equipmentTypeId\":" + hoistType + ",\"parentId\":" + id(child)
@@ -303,6 +320,14 @@ class MasterDataApiTests {
         assertThat((List<?>) JsonPath.read(assigned, "$.ids")).hasSize(1);
         assertThat((List<?>) JsonPath.read(assigned, "$.items[*].code")).hasSize(1); // codes for the screen
         send(put(BASE + "/equipment/" + id(child) + "/locations"), ADMIN, "{\"locationIds\":[999999]}", 400);
+
+        // the parent cannot be deleted while it still has sub-equipment, and the message says so
+        String parentInUse = send(delete(BASE + "/equipment/" + parentId), ADMIN, null, 409);
+        assertThat((String) JsonPath.read(parentInUse, "$.message")).startsWith("Equipment ")
+                .contains("1 piece of sub-equipment (it is their parent)");
+        // an equipment type in use says so too
+        String typeInUse = send(delete(BASE + "/equipment-types/" + hoistType), SUPER, null, 422); // built-in: refused first
+        assertThat((String) JsonPath.read(typeInUse, "$.code")).isEqualTo("NOT_ALLOWED");
 
         // deleting equipment removes its location assignments
         send(delete(BASE + "/equipment/" + id(child)), ADMIN, null, 204);

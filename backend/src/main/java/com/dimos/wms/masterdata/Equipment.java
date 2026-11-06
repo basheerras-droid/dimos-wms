@@ -35,7 +35,9 @@ class Equipment extends SiteEntity {
     @JoinColumn(name = "area_id")
     Area area;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // EAGER on purpose: a lazy parent is a Hibernate proxy, and reading its package-private fields (as the services do)
+    // returns null on a proxy. That gave HTTP 500 when a child was read before its parent.
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "parent_id")
     Equipment parent;
 

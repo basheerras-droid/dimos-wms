@@ -107,6 +107,11 @@ class LocationLinkService
     }
 
     @Override
+    String displayName(LocationLink l) {
+        return "The link " + l.fromLocation.code + " -> " + l.toLocation.code;
+    }
+
+    @Override
     Set<String> sortFields() {
         return Set.of("id", "cost", "enabled", "updatedAt");
     }

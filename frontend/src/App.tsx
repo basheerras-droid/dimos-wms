@@ -1,12 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { CssBaseline, ThemeProvider } from '@mui/material'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 import AppShell from './components/AppShell'
 import { leafItems } from './components/navItems'
 import ChangePasswordPage from './components/ChangePasswordPage'
 import DashboardPage from './components/DashboardPage'
 import LoginPage from './components/LoginPage'
 import NotFoundPage from './components/NotFoundPage'
+import GroupRedirect from './components/GroupRedirect'
 import PlaceholderPage from './components/PlaceholderPage'
 import RequirePermission from './components/RequirePermission'
 import { theme } from './theme'
@@ -24,7 +25,8 @@ export default function App() {
             <Route path="/change-password" element={<ChangePasswordPage />} />
             <Route element={<AppShell />}>
               <Route index element={<DashboardPage />} />
-              <Route path="/masterdata" element={<Navigate to="/masterdata/areas" replace />} />
+              <Route path="/masterdata" element={<GroupRedirect group="masterdata" />} />
+              <Route path="/administration" element={<GroupRedirect group="administration" />} />
               {leafItems()
                 .filter((n) => n.path !== '/')
                 .map((n) => (

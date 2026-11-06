@@ -47,7 +47,9 @@ export default function AppShell() {
   const width = compact ? WIDE : collapsed ? NARROW : WIDE
   const showText = compact || !collapsed
 
-  const allowed = (item: NavItem) => !item.permission || user.permissions.includes(item.permission)
+  const has = (permission?: string) => !permission || user.permissions.includes(permission)
+  const allowed = (item: NavItem): boolean =>
+    item.children ? has(item.permission) && item.children.some((c) => has(c.permission)) : has(item.permission)
   const isOn = (path: string) => (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path))
 
   const renderItem = (item: NavItem, depth: number) => {

@@ -8,7 +8,7 @@ export function errorText(t: TFunction, e: unknown): string {
       case 'STALE_VERSION':
         return t('md.error.stale')
       case 'IN_USE':
-        return t('md.error.inUse')
+        return e.message && e.message !== e.code ? e.message : t('md.error.inUse')
       case 'NOT_FOUND':
         return t('md.error.notFound')
       case 'NOT_ALLOWED':

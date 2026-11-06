@@ -69,6 +69,17 @@ class LocationTypeService extends MasterDataService<LocationType, LocationTypeSe
     }
 
     @Override
+    java.util.List<Usage> usages() {
+        return java.util.List.of(
+                new Usage("location", "locations", "select count(*) from location where location_type_id = ?"));
+    }
+
+    @Override
+    String displayName(LocationType t) {
+        return "Location type " + t.code;
+    }
+
+    @Override
     Set<String> sortFields() {
         return Set.of("id", "code", "name", "capacityHu", "updatedAt");
     }

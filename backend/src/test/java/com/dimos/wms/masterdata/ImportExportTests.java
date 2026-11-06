@@ -271,7 +271,8 @@ class ImportExportTests {
         csvImport("hu-type-nesting", "inner_hu_type_code,outer_hu_type_code,max_qty\nZT-CARTON,ZT-PALLET,40\n", false, 200);
         String loop = csvImport("hu-type-nesting", "inner_hu_type_code,outer_hu_type_code\nZT-PALLET,ZT-CARTON\n", false, 422);
         assertThat((String) JsonPath.read(loop, "$.rows[0].message")).contains("placedIn");
-        assertThat(jdbc.queryForObject("select count(*) from hu_type_nesting", Integer.class)).isEqualTo(1);
+        assertThat(jdbc.queryForObject("select count(*) from hu_type_nesting n join hu_type h on h.id = n.inner_hu_type_id "
+                + "where h.code like 'ZT%'", Integer.class)).isEqualTo(1); // only our own test rows
 
         // unknown equipment type is a row error
         String badType = csvImport("equipment", "code,name,equipment_type_code\nZT-X,X,SPACESHIP\n", true, 200);

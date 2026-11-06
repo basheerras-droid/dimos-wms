@@ -22,6 +22,12 @@ class AppRole {
     @Column(nullable = false, updatable = false, insertable = false)
     private String code;
 
+    @Column(updatable = false, insertable = false)
+    private String name;
+
+    @Column(updatable = false, insertable = false)
+    private String description;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),
@@ -33,6 +39,14 @@ class AppRole {
 
     String getCode() {
         return code;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    String getDescription() {
+        return description;
     }
 
     Set<AppPermission> getPermissions() {
