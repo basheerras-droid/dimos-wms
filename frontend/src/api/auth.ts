@@ -1,12 +1,28 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api, ApiError } from './client'
 
+/** Where this browser is registered as a workstation (or office mode), as the server sees it. */
+export interface WorkstationInfo {
+  /** OFFICE (not registered), REGISTERED, DISABLED (workstation switched off) or IP_MISMATCH (wrong network address). */
+  mode: 'OFFICE' | 'REGISTERED' | 'DISABLED' | 'IP_MISMATCH'
+  /** This browser has a registration cookie that the server no longer accepts. */
+  staleCookie: boolean
+  code: string | null
+  name: string | null
+  type: string | null
+  groupCode: string | null
+  locationCode: string | null
+  /** The workstation cuts down the user's permissions. */
+  restricted: boolean
+}
+
 export interface Me {
   username: string
   displayName: string
   roles: string[]
   permissions: string[]
   mustChangePassword: boolean
+  workstation: WorkstationInfo
 }
 
 const ME_KEY = ['me'] as const
@@ -60,5 +76,14 @@ export function useChangePassword() {
     mutationFn: (v: { currentPassword: string; newPassword: string }) =>
       api<Me>('/api/auth/change-password', { method: 'POST', body: v }),
     onSuccess: (me) => qc.setQueryData(ME_KEY, me),
+  })
+}
+
+/** "Unregister this browser" (super administrators): back to office mode, whatever a workstation group allows. */
+export function useUnregisterBrowser() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: () => api<void>('/api/workstation/unregister', { method: 'POST' }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ME_KEY }),
   })
 }

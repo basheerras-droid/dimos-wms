@@ -34,11 +34,22 @@ class AuthController {
                                  @NotBlank @Size(min = 8, max = 128) String newPassword) {
     }
 
+    /** Where the browser is registered as a workstation (or office mode) and whether that restricts the user. */
+    record WorkstationInfo(String mode, boolean staleCookie, String code, String name, String type, String groupCode,
+                           String locationCode, boolean restricted) {
+        static WorkstationInfo of(WorkstationContext c) {
+            return new WorkstationInfo(c.mode().name(), c.staleCookie(), c.code(), c.name(), c.type(), c.groupCode(),
+                    c.locationCode(), c.restricts());
+        }
+    }
+
     record MeResponse(String username, String displayName, List<String> roles, List<String> permissions,
-                      boolean mustChangePassword) {
-        static MeResponse of(WmsUserPrincipal p) {
-            return new MeResponse(p.username(), p.displayName(), p.roles(), p.permissions(),
-                    p.mustChangePassword());
+                      boolean mustChangePassword, WorkstationInfo workstation) {
+        /** The permissions shown are the ones that apply at this workstation. */
+        static MeResponse of(WmsUserPrincipal p, WorkstationContext ctx) {
+            WmsUserPrincipal effective = ctx.restricts() ? WorkstationFilter.restrict(p, ctx) : p;
+            return new MeResponse(effective.username(), effective.displayName(), effective.roles(), effective.permissions(),
+                    effective.mustChangePassword(), WorkstationInfo.of(ctx));
         }
     }
 
@@ -50,9 +61,12 @@ class AuthController {
     private final SecurityContextHolderStrategy holder = SecurityContextHolder.getContextHolderStrategy();
 
     private final UserSessions sessions;
+    private final WorkstationResolver workstationResolver;
 
-    AuthController(AuthService auth, SecurityContextRepository contextRepository, UserSessions sessions) {
+    AuthController(AuthService auth, SecurityContextRepository contextRepository, UserSessions sessions,
+                   WorkstationResolver workstationResolver) {
         this.sessions = sessions;
+        this.workstationResolver = workstationResolver;
         this.auth = auth;
         this.contextRepository = contextRepository;
     }
@@ -75,12 +89,15 @@ class AuthController {
             request.changeSessionId(); // protects against session fixation
         }
         startSession(result.principal(), request, response);
-        return ResponseEntity.ok(MeResponse.of(result.principal()));
+        return ResponseEntity.ok(MeResponse.of(result.principal(), workstationResolver.resolve(request, result.principal().siteId())));
     }
 
     @GetMapping("/me")
-    MeResponse me(Authentication authentication) {
-        return MeResponse.of((WmsUserPrincipal) authentication.getPrincipal());
+    MeResponse me(Authentication authentication, HttpServletRequest request) {
+        WmsUserPrincipal principal = (WmsUserPrincipal) authentication.getPrincipal(); // already restricted by WorkstationFilter
+        Object ctx = request.getAttribute(WorkstationFilter.ATTRIBUTE);
+        WorkstationContext workstation = ctx instanceof WorkstationContext c ? c : WorkstationContext.OFFICE;
+        return MeResponse.of(principal, workstation); // restricting twice gives the same result
     }
 
     @PostMapping("/logout")
@@ -112,7 +129,7 @@ class AuthController {
         }
         WmsUserPrincipal updated = principal.withMustChangePassword(false);
         startSession(updated, request, response);
-        return ResponseEntity.ok(MeResponse.of(updated));
+        return ResponseEntity.ok(MeResponse.of(updated, workstationResolver.resolve(request, updated.siteId())));
     }
 
     private void startSession(WmsUserPrincipal principal, HttpServletRequest request, HttpServletResponse response) {

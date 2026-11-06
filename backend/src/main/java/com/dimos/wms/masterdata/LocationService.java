@@ -124,7 +124,9 @@ class LocationService extends MasterDataService<Location, LocationService.Reques
                 new Usage("link that ends here", "links that end here",
                         "select count(*) from location_link where to_location_id = ?"),
                 new Usage("piece of equipment it is assigned to", "pieces of equipment it is assigned to",
-                        "select count(*) from equipment_location where location_id = ?"));
+                        "select count(*) from equipment_location where location_id = ?"),
+                new Usage("workstation placed here", "workstations placed here",
+                        "select count(*) from workstation where location_id = ?"));
     }
 
     @Override

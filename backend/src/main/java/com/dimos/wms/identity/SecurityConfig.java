@@ -37,8 +37,8 @@ class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository contextRepository)
-            throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository contextRepository,
+                                            WorkstationResolver workstationResolver) throws Exception {
         http
             .securityContext(c -> c.securityContextRepository(contextRepository))
             .csrf(csrf -> csrf
@@ -46,6 +46,8 @@ class SecurityConfig {
                 .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
             .addFilterAfter(new CsrfCookieFilter(), CsrfFilter.class)
             .addFilterBefore(new PasswordChangeRequiredFilter(), AuthorizationFilter.class)
+            // the workstation of the request cuts down the user's permissions (see WorkstationFilter)
+            .addFilterBefore(new WorkstationFilter(workstationResolver), AuthorizationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 // build version, build time and git commit: shown on the login page and in the footer

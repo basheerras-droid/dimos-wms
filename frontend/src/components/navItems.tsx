@@ -12,6 +12,8 @@ import GroupsPage from './admin/GroupsPage'
 import PermissionsPage from './admin/PermissionsPage'
 import RolesPage from './admin/RolesPage'
 import UsersPage from './admin/UsersPage'
+import WorkstationGroupsPage from './admin/WorkstationGroupsPage'
+import WorkstationsPage from './admin/WorkstationsPage'
 import EntityPage from './masterdata/EntityPage'
 import EquipmentTypesPage from './masterdata/EquipmentTypesPage'
 import LayoutPage from './layout/LayoutPage'
@@ -69,6 +71,8 @@ export const navItems: NavItem[] = [
       { key: 'groups', path: '/administration/groups', permission: 'USER_MANAGE', element: <GroupsPage key="groups" /> },
       { key: 'roles', path: '/administration/roles', permission: 'ROLE_MANAGE', element: <RolesPage key="roles" /> },
       { key: 'permissions', path: '/administration/permissions', permission: 'ROLE_MANAGE', element: <PermissionsPage key="permissions" /> },
+      { key: 'workstations', path: '/administration/workstations', permission: 'WORKSTATION_MANAGE', element: <WorkstationsPage key="workstations" /> },
+      { key: 'workstationGroups', path: '/administration/workstation-groups', permission: 'WORKSTATION_MANAGE', element: <WorkstationGroupsPage key="workstation-groups" /> },
       { key: 'auditLog', path: '/administration/audit', permission: 'AUDIT_VIEW', element: <AuditPage key="audit" /> },
     ],
   },

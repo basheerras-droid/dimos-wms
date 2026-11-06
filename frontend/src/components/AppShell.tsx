@@ -1,6 +1,7 @@
 import LogoutIcon from '@mui/icons-material/Logout'
 import MenuIcon from '@mui/icons-material/Menu'
 import KeyIcon from '@mui/icons-material/Key'
+import LinkOffIcon from '@mui/icons-material/LinkOff'
 import ExpandLess from '@mui/icons-material/ExpandLess'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import {
@@ -11,9 +12,10 @@ import { useTheme } from '@mui/material/styles'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router'
-import { useLogout, useMe } from '../api/auth'
+import { useLogout, useMe, useUnregisterBrowser } from '../api/auth'
 import { brand } from '../theme'
 import BuildVersion from './BuildVersion'
+import WorkstationChip from './WorkstationChip'
 import { navItems, type NavItem } from './navItems'
 
 const WIDE = 240
@@ -32,6 +34,7 @@ export default function AppShell() {
   const compact = useMediaQuery(theme.breakpoints.down('md')) // tablets and handhelds: drawer slides over
   const me = useMe()
   const logout = useLogout()
+  const unregister = useUnregisterBrowser()
   const navigate = useNavigate()
   const location = useLocation()
   const [collapsed, setCollapsed] = useState(false)
@@ -144,6 +147,7 @@ export default function AppShell() {
             {t('app.name')}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
+          <WorkstationChip workstation={user.workstation} />
           <Box sx={{ textAlign: 'right', mr: 1.5, display: { xs: 'none', sm: 'block' } }}>
             <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>{user.displayName}</Typography>
             <Typography variant="caption" color="text.secondary">{user.roles.join(', ')}</Typography>
@@ -165,6 +169,12 @@ export default function AppShell() {
               <ListItemIcon><KeyIcon fontSize="small" /></ListItemIcon>
               {t('user.changePassword')}
             </MenuItem>
+            {user.roles.includes('SUPER_ADMIN') && (user.workstation.mode !== 'OFFICE' || user.workstation.staleCookie) && (
+              <MenuItem onClick={() => { setAnchor(null); unregister.mutate() }}>
+                <ListItemIcon><LinkOffIcon fontSize="small" /></ListItemIcon>
+                {t('workstation.unregister')}
+              </MenuItem>
+            )}
             <MenuItem onClick={() => { setAnchor(null); logout.mutate(undefined, { onSettled: () => navigate('/login', { replace: true }) }) }}>
               <ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
               {t('user.logout')}

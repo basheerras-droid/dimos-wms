@@ -269,3 +269,152 @@ export function useDeleteGroup() {
     },
   })
 }
+
+// ---- workstation groups and workstations -----------------------------------------------------------------
+
+export type WorkstationType = 'PC' | 'HANDHELD' | 'HMI' | 'KIOSK'
+export const WORKSTATION_TYPES: WorkstationType[] = ['PC', 'HANDHELD', 'HMI', 'KIOSK']
+
+export interface WorkstationGroup {
+  id: number
+  code: string
+  name: string
+  description: string | null
+  enabled: boolean
+  /** Empty = no restriction. */
+  allowedPermissions: string[]
+  workstationCount: number
+  version: number
+  updatedAt: string
+  updatedBy: string
+}
+
+export interface WorkstationGroupInput {
+  code: string
+  name: string
+  description: string | null
+  enabled: boolean
+  allowedPermissions: string[]
+  version?: number
+}
+
+export interface Workstation {
+  id: number
+  code: string
+  name: string
+  type: WorkstationType
+  locationId: number | null
+  locationCode: string | null
+  workstationGroupId: number | null
+  workstationGroupCode: string | null
+  hostName: string | null
+  ipAddress: string | null
+  checkIp: boolean
+  defaultPrinter: string | null
+  enabled: boolean
+  registered: boolean
+  registeredAt: string | null
+  registeredBy: string | null
+  version: number
+  updatedAt: string
+  updatedBy: string
+}
+
+export interface WorkstationInput {
+  code: string
+  name: string
+  type: WorkstationType
+  locationId: number | null
+  workstationGroupId: number | null
+  hostName: string | null
+  ipAddress: string | null
+  checkIp: boolean
+  defaultPrinter: string | null
+  enabled: boolean
+  version?: number
+}
+
+export function useWorkstationGroups(params: ListParams) {
+  return useQuery<Page<WorkstationGroup>>({
+    queryKey: ['admin-ws-groups', params],
+    queryFn: () => api<Page<WorkstationGroup>>(`${ADMIN}/workstation-groups${query(params)}`),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export const fetchWorkstationGroup = (id: number) => api<WorkstationGroup>(`${ADMIN}/workstation-groups/${id}`)
+
+export function useSaveWorkstationGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (v: { id?: number; body: WorkstationGroupInput }) =>
+      v.id === undefined
+        ? api<WorkstationGroup>(`${ADMIN}/workstation-groups`, { method: 'POST', body: v.body })
+        : api<WorkstationGroup>(`${ADMIN}/workstation-groups/${v.id}`, { method: 'PUT', body: v.body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['admin-ws-groups'] })
+      void qc.invalidateQueries({ queryKey: ['admin-workstations'] })
+      void qc.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+export function useDeleteWorkstationGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => api<void>(`${ADMIN}/workstation-groups/${id}`, { method: 'DELETE' }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin-ws-groups'] }),
+  })
+}
+
+export function useWorkstations(params: ListParams) {
+  return useQuery<Page<Workstation>>({
+    queryKey: ['admin-workstations', params],
+    queryFn: () => api<Page<Workstation>>(`${ADMIN}/workstations${query(params)}`),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export const fetchWorkstation = (id: number) => api<Workstation>(`${ADMIN}/workstations/${id}`)
+
+export function useSaveWorkstation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (v: { id?: number; body: WorkstationInput }) =>
+      v.id === undefined
+        ? api<Workstation>(`${ADMIN}/workstations`, { method: 'POST', body: v.body })
+        : api<Workstation>(`${ADMIN}/workstations/${v.id}`, { method: 'PUT', body: v.body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['admin-workstations'] })
+      void qc.invalidateQueries({ queryKey: ['admin-ws-groups'] })
+      void qc.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+export function useDeleteWorkstation() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => api<void>(`${ADMIN}/workstations/${id}`, { method: 'DELETE' }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin-workstations'] }),
+  })
+}
+
+/** Registers THIS browser as the workstation (the server sets the cookie) or removes the registration. */
+export function useRegistration() {
+  const qc = useQueryClient()
+  const done = () => {
+    void qc.invalidateQueries({ queryKey: ['admin-workstations'] })
+    void qc.invalidateQueries({ queryKey: ['me'] })
+  }
+  return {
+    register: useMutation({
+      mutationFn: (id: number) => api<Workstation>(`${ADMIN}/workstations/${id}/register`, { method: 'POST' }),
+      onSuccess: done,
+    }),
+    revoke: useMutation({
+      mutationFn: (id: number) => api<Workstation>(`${ADMIN}/workstations/${id}/revoke`, { method: 'POST' }),
+      onSuccess: done,
+    }),
+  }
+}
