@@ -27,6 +27,13 @@
   are left alone: no new version, no audit); a column left out of the file keeps the stored value. Templates:
   `GET /import/{type}/template`, exports: `GET /export/{type}`, table list: `GET /import/types`. Limits: 10 MB, 50 000 rows.
   CSV exports defuse spreadsheet formulas (leading ' on =, +, @). An update with no real change no longer creates a new version.
+- Step E4: configuration validator, `GET /api/masterdata/validation` (MASTERDATA_VIEW). 14 rules, each PASS / WARNING / ERROR with
+  the records concerned (entity type + id, max 200 per rule, full count): enabled links to disabled locations or equipment,
+  duplicate links, same from/to pair with an all-types link AND a type-specific link (WARNING), locations with no incoming /
+  outgoing link (storage bins, workstations, inbound/outbound ends exempt), storage not reachable from an inbound location or
+  with no path to an outbound location, location types accepting no HU type (ERROR when used), HU types accepted nowhere,
+  equipment without locations, a location claimed by two equipment of the same type, locations at the same position/level,
+  locations without x/y. Measured: 20 001 locations + 39 998 links in 215 ms.
 
 ## 2026-11-05
 - Brand rules: only the standard DIMOS logo, on a white top bar; negative logo removed.
