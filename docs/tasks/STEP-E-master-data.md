@@ -74,6 +74,16 @@ Menu changes (all text through i18n, brand rules from CLAUDE.md):
 - **Layout preview** (first version of the plant view): a 2D SVG plot of locations by x/y per level, coloured by
   area, links drawn as lines, blocked locations marked, zoom and pan, click a location to open its record.
   Keep it simple; Step F turns it into the live overview.
+- **Layout preview, second view: rack face** (owner's note, 2026-11-06; needed by the INL reference project - pallet AS/RS,
+  about 74 columns x 12 levels per aisle side). Choose an aisle and a side; show a grid with `column_no` on the x axis and
+  `level_no` on the y axis, one cell per location, coloured by state (enabled / disabled / blocked in / blocked out / both),
+  a fill-level figure for that aisle side, and a click on a cell opens the location record.
+  Implementation notes:
+  - Needs a small backend call for it (one aisle side = about 900 cells, more than the 200-row list limit): the list of
+    aisles/sides of the site, and the compact cells of one aisle side (id, code, column_no, level_no, state flags).
+  - The fill-level figure needs stock data, which comes with the inventory step. Until then show the share of usable
+    locations (enabled and not blocked) and mark "occupancy: available with inventory"; keep the field ready for stock.
+  - Possible extra validator rule (E4 follow-up): two locations with the same aisle + side + column_no + level_no.
 - Import screen: choose entity -> download template -> upload -> dry-run result table -> Apply.
 
 ## E6 - Demo project data (product/project separation)
@@ -84,6 +94,8 @@ Menu changes (all text through i18n, brand rules from CLAUDE.md):
 - A documented way to load a project's data set (admin screen button "Load project data" or a command), so later
   `projects/ekfc/` can be loaded the same way. Customer-owned material (PLC programs, drawings) never goes in Git.
 - The configuration validator must report PASS (warnings allowed) for the demo data.
+- Also generate one rack of the INL size (74 columns x 12 levels x 2 sides per aisle, a few aisles) for the rack-face view
+  and the performance measurements.
 - Also measure import time (dry run and apply) with a larger generated set - e.g. 5,000 locations and 10,000 links -
   because the first real project data (DFC) will be that size. Record the times in `docs/test-evidence/STEP-E.md`
   and optimise the importer if it is slow (owner's request, 2026-11-06).
