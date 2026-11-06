@@ -1,8 +1,10 @@
 {
   "app": {
     "name": "DIMOS WMS",
-    "version": "Version {{version}}",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "build": "build {{time}}",
+    "commit": "commit {{commit}}",
+    "commitDirty": "commit {{commit}} (with uncommitted changes)"
   },
   "login": {
     "title": "Sign in",

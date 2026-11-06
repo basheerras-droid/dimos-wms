@@ -23,7 +23,8 @@ Browsers show a warning for a self-signed certificate; accept it for the test. E
 ```powershell
 cd D:\WMS\src\dimos-wms\backend
 .\mvnw.cmd -Pfrontend clean package
-Copy-Item target\wms-backend-0.0.1-SNAPSHOT.jar D:\WMS\app\wms-backend.jar -Force
+# the jar is named after the pom version (e.g. wms-backend-0.1.0.jar); take the newest one
+Get-ChildItem target\wms-backend-*.jar | Sort-Object LastWriteTime | Select-Object -Last 1 | Copy-Item -Destination D:\WMS\app\wms-backend.jar -Force
 ```
 
 ## 4. Firewall (inbound TCP 8443, local subnet only)

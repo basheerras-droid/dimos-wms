@@ -39,6 +39,17 @@
   export, side drawer for create/edit/view with required marks, server errors next to the field, the 409 "changed by someone
   else - reload" message with a Reload button, delete with confirmation. Screens: Areas, Location types, HU types. Edit buttons
   appear only with MASTERDATA_EDIT. `/api/auth/me` permissions are used by the UI (`useCan`).
+- Fix: Master data -> Location types answered HTTP 500 when the search box was empty (the controller passed "no filter" as
+  null and combining a query with null failed). The service now accepts "no filter" and the controller was aligned with the
+  others. New test `ListEndpointsTests` opens the list of EVERY master-data table with default sort, paging, search text, every
+  sort field (asc and desc) and the web screens' filters, and checks that every table is covered.
+- Build version: pom version is now 0.1.0 (jar `wms-backend-0.1.0.jar`; deploy README picks the newest jar). Spring Boot
+  build-info + git-commit-id plugin 9.2.0 (only branch, short commit, commit time, dirty flag - no names or e-mails). The real
+  build time is used (the Spring Boot parent would pin it to 1980-02-01). `/actuator/info` is open without login and shows only
+  build version/time and git commit (env, os, java, process are off). Footer and login page show e.g.
+  "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
+- UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
+  collapses it to icons.
 - Step E5.2 (front end): Locations screen (all fields, filters area / location type / level / enabled / blocked, hidden-by-default
   columns for position, weight, reason; tick several rows and block / unblock inbound or outbound, enable or disable them in one
   go, with a reason dialog when blocking, max 1 000 rows) and Location links screen (from / to location chosen by searching the

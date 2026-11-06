@@ -13,9 +13,10 @@ import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router'
 import { useLogout, useMe } from '../api/auth'
 import { brand } from '../theme'
+import BuildVersion from './BuildVersion'
 import { navItems, type NavItem } from './navItems'
 
-const WIDE = 232
+const WIDE = 240
 const NARROW = 64
 
 /** Dark panel for the side navigation only (other drawers, e.g. the edit drawer, stay white). */
@@ -57,6 +58,7 @@ export default function AppShell() {
     const button = (
       <ListItemButton
         key={item.key}
+        title={t(`nav.${item.key}`)}
         selected={selected && (!group || !showText)}
         onClick={() => {
           if (group && showText) {
@@ -67,9 +69,9 @@ export default function AppShell() {
           setMobileOpen(false)
         }}
         sx={(th) => ({
-          minHeight: depth ? 40 : 48,
-          px: 2.5,
-          pl: depth ? 6.5 : 2.5,
+          minHeight: depth ? 38 : 46,
+          px: 2,
+          pl: depth ? 5.5 : 2,
           position: 'relative',
           color: depth ? th.palette.nav.subText : th.palette.nav.text,
           '&:hover': { backgroundColor: th.palette.nav.hover },
@@ -89,7 +91,7 @@ export default function AppShell() {
         {item.icon && (
           <ListItemIcon
             sx={(th) => ({
-              minWidth: 0, mr: showText ? 2 : 0, color: selected ? th.palette.nav.selectedText : th.palette.nav.icon,
+              minWidth: 0, mr: showText ? 1.75 : 0, color: selected ? th.palette.nav.selectedText : th.palette.nav.icon,
             })}
           >
             {item.icon}
@@ -98,7 +100,9 @@ export default function AppShell() {
         {showText && (
           <ListItemText
             primary={t(`nav.${item.key}`)}
-            slotProps={{ primary: { sx: { fontWeight: selected ? 600 : 500, color: 'inherit', fontSize: depth ? 14 : undefined } } }}
+            // one line only: long labels get an ellipsis (the full text is the button's title)
+            slotProps={{ primary: { noWrap: true, sx: { fontWeight: selected ? 600 : 500, color: 'inherit', fontSize: depth ? 13 : 14 } } }}
+            sx={{ minWidth: 0 }}
           />
         )}
         {group && showText && (open ? <ExpandLess fontSize="small" /> : <ExpandMore fontSize="small" />)}
@@ -184,9 +188,7 @@ export default function AppShell() {
         <Box sx={{ flex: 1, p: { xs: 2, md: 3 } }}>
           <Outlet />
         </Box>
-        <Typography variant="caption" color="text.secondary" sx={{ px: 3, pb: 1.5 }}>
-          {t('app.name')} - {t('app.version', { version: __APP_VERSION__ })}
-        </Typography>
+        <BuildVersion sx={{ px: 3, pb: 1.5 }} />
       </Box>
     </Box>
   )

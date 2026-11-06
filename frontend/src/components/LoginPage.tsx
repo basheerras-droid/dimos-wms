@@ -5,6 +5,7 @@ import { Navigate } from 'react-router'
 import { ApiError } from '../api/client'
 import { useLogin, useMe } from '../api/auth'
 import { brand } from '../theme'
+import BuildVersion from './BuildVersion'
 
 export default function LoginPage() {
   const { t } = useTranslation()
@@ -86,9 +87,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
       </Box>
-      <Typography variant="caption" color="text.secondary" align="center" sx={{ pb: 2 }}>
-        {t('app.name')} - {t('app.version', { version: __APP_VERSION__ })}
-      </Typography>
+      <BuildVersion align="center" sx={{ pb: 2 }} />
     </Box>
   )
 }

@@ -48,6 +48,8 @@ class SecurityConfig {
             .addFilterBefore(new PasswordChangeRequiredFilter(), AuthorizationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
+                // build version, build time and git commit: shown on the login page and in the footer
+                .requestMatchers("/actuator/info").permitAll()
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/api/**", "/actuator/**").authenticated()
                 // Everything else is the public web-app bundle (HTML/JS/CSS/images); it contains no data.

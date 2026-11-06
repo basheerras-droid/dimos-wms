@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.dimos</groupId>
 	<artifactId>wms-backend</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0</version>
 	<name>wms-backend</name>
 	<description/>
 	<url/>
@@ -31,6 +31,8 @@
 		<spring-modulith.version>2.1.1</spring-modulith.version>
 		<poi.version>5.5.1</poi.version> <!-- Apache POI: XLSX import/export (Apache 2.0) -->
 		<commons-csv.version>1.14.1</commons-csv.version> <!-- CSV import/export (Apache 2.0) -->
+		<!-- Real build time (UTC) for /actuator/info; the Spring Boot parent would otherwise pin it to 1980-02-01. -->
+		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -155,8 +157,46 @@
 	<build>
 		<plugins>
 			<plugin>
+				<!-- Writes git.properties (branch, short commit id, commit time, dirty flag) - nothing personal. -->
+				<groupId>io.github.git-commit-id</groupId>
+				<artifactId>git-commit-id-maven-plugin</artifactId>
+				<version>9.2.0</version>
+				<executions>
+					<execution>
+						<id>get-the-git-infos</id>
+						<phase>initialize</phase>
+						<goals><goal>revision</goal></goals>
+					</execution>
+				</executions>
+				<configuration>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+					<failOnNoGitDirectory>false</failOnNoGitDirectory>
+					<commitIdGenerationMode>flat</commitIdGenerationMode>
+					<includeOnlyProperties>
+						<includeOnlyProperty>^git\.branch$</includeOnlyProperty>
+						<includeOnlyProperty>^git\.commit\.id\.(abbrev|full)$</includeOnlyProperty>
+						<includeOnlyProperty>^git\.commit\.time$</includeOnlyProperty>
+						<includeOnlyProperty>^git\.dirty$</includeOnlyProperty>
+					</includeOnlyProperties>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>build-info</id>
+						<goals><goal>build-info</goal></goals>
+						<configuration>
+							<time>${maven.build.timestamp}</time>
+							<additionalProperties>
+								<!-- "true" when the build was made from a working tree with uncommitted changes -->
+								<dirty>${git.dirty}</dirty>
+							</additionalProperties>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

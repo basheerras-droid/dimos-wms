@@ -16,6 +16,7 @@ export default defineConfig({
     // During `npm run dev` the API is the Spring Boot backend running on this machine.
     proxy: {
       '/api': 'http://localhost:8080',
+      '/actuator': 'http://localhost:8080',
     },
   },
 })

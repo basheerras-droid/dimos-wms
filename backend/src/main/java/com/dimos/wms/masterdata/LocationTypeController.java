@@ -31,6 +31,6 @@ class LocationTypeController
                                                   @RequestParam(defaultValue = "50") int size,
                                                   @RequestParam(required = false) String sort,
                                                   @AuthenticationPrincipal WmsUserPrincipal who) {
-        return service.search(Specs.<LocationType>search(q, "code", "name"), page, size, sort, who);
+        return service.search(Specs.all(Specs.<LocationType>search(q, "code", "name")), page, size, sort, who);
     }
 }

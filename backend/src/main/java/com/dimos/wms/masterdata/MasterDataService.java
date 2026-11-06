@@ -60,7 +60,10 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
 
     @Transactional(readOnly = true)
     public PageResult<R> search(Specification<E> filter, int page, int size, String sort, WmsUserPrincipal who) {
-        Specification<E> spec = Specs.<E>bySite(who.siteId()).and(filter);
+        Specification<E> spec = Specs.<E>bySite(who.siteId());
+        if (filter != null) { // "no filter" is normal (empty search box); combining with null would fail
+            spec = spec.and(filter);
+        }
         Page<E> result = repository.findAll(spec, PageRequest.of(Math.max(page, 0),
                 Math.min(Math.max(size, 1), MAX_PAGE_SIZE), parseSort(sort)));
         return new PageResult<>(result.getContent().stream().map(this::toResponse).toList(),
