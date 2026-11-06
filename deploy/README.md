@@ -123,8 +123,15 @@ $dump.FullName
 # 1. Empty scratch database owned by wms_owner
 & "$bin\createdb.exe" -h localhost -U postgres -O wms_owner wms_restore_test
 
+# 1b. pgpass line for the scratch database (the existing line only covers wms_dev). Once per machine; skip if already added.
+$pgpass = "D:\WMS\secrets\pgpass.conf"           # laptop: "$env:APPDATA\postgresql\pgpass.conf"
+$s = Read-Host "wms_owner password" -AsSecureString
+$pw = [System.Net.NetworkCredential]::new("", $s).Password
+Add-Content $pgpass "localhost:5432:wms_restore_test:wms_owner:$pw" -Encoding ASCII
+Remove-Variable pw, s
+
 # 2. Restore (uses the pgpass file of wms_owner; stops at the first error)
-$env:PGPASSFILE = "D:\WMS\secrets\pgpass.conf"   # laptop: omit this line (default location is used)
+$env:PGPASSFILE = $pgpass                        # laptop: this line may be omitted (default location is used)
 & "$bin\pg_restore.exe" -h localhost -U wms_owner -d wms_restore_test --no-owner --exit-on-error -w $dump.FullName
 "pg_restore exit code: $LASTEXITCODE"            # must be 0
 
