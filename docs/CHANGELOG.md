@@ -39,6 +39,11 @@
   export, side drawer for create/edit/view with required marks, server errors next to the field, the 409 "changed by someone
   else - reload" message with a Reload button, delete with confirmation. Screens: Areas, Location types, HU types. Edit buttons
   appear only with MASTERDATA_EDIT. `/api/auth/me` permissions are used by the UI (`useCan`).
+- Step E5.2 (front end): Locations screen (all fields, filters area / location type / level / enabled / blocked, hidden-by-default
+  columns for position, weight, reason; tick several rows and block / unblock inbound or outbound, enable or disable them in one
+  go, with a reason dialog when blocking, max 1 000 rows) and Location links screen (from / to location chosen by searching the
+  server, handling-unit type empty = "All types", optional equipment, cost). New searchable reference field (`RefField`, 20 matches
+  at a time from the server) that scales to thousands of locations. Menu: Areas, Location types, Locations, Location links, HU types.
 - UI: dark side navigation (Schwarzgrau panel, text #E8EAEC, sub-items #B9BEC2, selected = 4 px Blutorange bar + rgba(215,44,6,0.18)
   background + white text, hover #3A4047). Colours are theme tokens (`palette.nav`). Contrast checked: all text at least 5.6:1.
 - Flyway V5: four more built-in equipment types (ETV, MONORAIL, TURNTABLE, WASHER; 17 in total). CLAUDE.md now lists the three

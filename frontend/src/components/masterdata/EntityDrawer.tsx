@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next'
 import { ApiError } from '../../api/client'
 import { fetchRecord, useSaveRecord } from '../../api/masterdata'
 import { errorText } from './errorText'
+import RefField from './RefField'
 import type { EntityConfig, FieldDef, Row } from './types'
 
 type Values = Record<string, string | boolean>
@@ -19,9 +20,13 @@ function toValues(config: EntityConfig, row: Row | null): Values {
     const v = row[f.name]
     if (f.type === 'boolean') values[f.name] = Boolean(v)
     else values[f.name] = v === null || v === undefined ? '' : String(v)
+    if (f.type === 'ref') values[labelKey(f.name)] = String(row[f.displayField ?? ''] ?? '')
   }
   return values
 }
+
+/** A "ref" field keeps the code of the chosen record next to its id, so it can be shown without a lookup. */
+const labelKey = (name: string) => `${name}__label`
 
 /** Turns the form values into the JSON the server expects (blank optional numbers become null). */
 function toBody(config: EntityConfig, values: Values, version: number | undefined): Record<string, unknown> {
@@ -30,7 +35,7 @@ function toBody(config: EntityConfig, values: Values, version: number | undefine
     if (f.editOnly && version === undefined) continue
     const v = values[f.name]
     if (f.type === 'boolean') body[f.name] = Boolean(v)
-    else if (f.type === 'integer' || f.type === 'decimal') {
+    else if (f.type === 'integer' || f.type === 'decimal' || f.type === 'ref') {
       const text = String(v ?? '').trim()
       body[f.name] = text === '' ? null : Number(text)
     } else {
@@ -134,6 +139,22 @@ function DrawerForm({ config, target, canEdit, onClose }: Props) {
     }
     const v = values[f.name]
     const set = (value: string | boolean) => setValues((p) => ({ ...p, [f.name]: value }))
+    if (f.type === 'ref') {
+      return (
+        <RefField
+          key={f.name}
+          label={label(f)}
+          refPath={f.refPath ?? ''}
+          value={String(v ?? '')}
+          valueLabel={String(values[labelKey(f.name)] ?? '')}
+          required={common.required}
+          disabled={readOnly}
+          error={common.error}
+          helperText={common.helperText}
+          onChange={(id, code) => setValues((p) => ({ ...p, [f.name]: id, [labelKey(f.name)]: code }))}
+        />
+      )
+    }
     if (f.type === 'boolean') {
       return (
         <Box key={f.name}>
@@ -141,7 +162,7 @@ function DrawerForm({ config, target, canEdit, onClose }: Props) {
             control={<Switch checked={Boolean(v)} onChange={(e) => set(e.target.checked)} disabled={readOnly} />}
             label={label(f)}
           />
-          {errors[f.name] && <Typography variant="caption" color="error" sx={{ display: "block" }}>{errors[f.name]}</Typography>}
+          {errors[f.name] && <Typography variant="caption" color="error" sx={{ display: 'block' }}>{errors[f.name]}</Typography>}
         </Box>
       )
     }

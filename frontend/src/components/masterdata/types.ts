@@ -1,6 +1,6 @@
 import type { Versioned } from '../../api/masterdata'
 
-export type FieldType = 'text' | 'multiline' | 'integer' | 'decimal' | 'boolean' | 'select'
+export type FieldType = 'text' | 'multiline' | 'integer' | 'decimal' | 'boolean' | 'select' | 'ref'
 
 /** One input in the edit drawer. The label comes from i18n key `md.fields.<name>`. */
 export interface FieldDef {
@@ -12,6 +12,10 @@ export interface FieldDef {
   /** For type "select": the allowed values; labels come from `<optionsLabelKey>.<value>`. */
   options?: string[]
   optionsLabelKey?: string
+  /** For type "ref": a link to a record of another table, chosen by searching it on the server. */
+  refPath?: string
+  /** For type "ref": the field of the loaded row that shows the chosen record (e.g. "areaCode"). */
+  displayField?: string
   /** Optional hint under the field, i18n key. */
   helpKey?: string
   /** Show the field only when editing an existing record (never when creating). */
@@ -28,14 +32,27 @@ export interface ColumnDef {
   sortable?: boolean
   /** Show values through `<optionsLabelKey>.<value>`. */
   optionsLabelKey?: string
+  /** Text shown when the value is empty (i18n key), e.g. "all types". */
+  emptyKey?: string
   hiddenByDefault?: boolean
 }
 
 export interface FilterDef {
   name: string
-  type: 'select' | 'boolean'
+  type: 'select' | 'boolean' | 'integer' | 'ref'
   options?: string[]
   optionsLabelKey?: string
+  /** For type "ref": the table whose records are offered. */
+  refPath?: string
+}
+
+/** One bulk action on the selected rows, sent to `bulk.path` as { ids, action, reason }. */
+export interface BulkAction {
+  action: string
+  /** i18n key of the button text. */
+  labelKey: string
+  /** Ask for a reason first (e.g. when blocking). */
+  needsReason?: boolean
 }
 
 /** Everything the generic list + drawer needs to manage one master-data table. */
@@ -50,6 +67,12 @@ export interface EntityConfig {
   filters?: FilterDef[]
   defaults: Record<string, string | boolean>
   defaultSort: string
+  /** Name of a row in messages such as "X will be deleted" (default: its code). */
+  rowLabel?: (row: Row) => string
+  /** Select several rows and apply one action to all of them. */
+  bulk?: { path: string; actions: BulkAction[]; max: number }
+  /** Placeholder of the search box, i18n key (default md.search). */
+  searchKey?: string
 }
 
 export type Row = Versioned & Record<string, unknown>

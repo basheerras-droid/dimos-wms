@@ -8,7 +8,7 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import SettingsIcon from '@mui/icons-material/Settings'
 import type { ReactElement } from 'react'
 import EntityPage from './masterdata/EntityPage'
-import { areasConfig, huTypesConfig, locationTypesConfig } from './masterdata/configs'
+import { areasConfig, huTypesConfig, locationLinksConfig, locationsConfig, locationTypesConfig } from './masterdata/configs'
 
 export interface NavItem {
   key: string
@@ -36,6 +36,8 @@ export const navItems: NavItem[] = [
     children: [
       { key: 'areas', path: '/masterdata/areas', element: <EntityPage config={areasConfig} /> },
       { key: 'locationTypes', path: '/masterdata/location-types', element: <EntityPage config={locationTypesConfig} /> },
+      { key: 'locations', path: '/masterdata/locations', element: <EntityPage config={locationsConfig} /> },
+      { key: 'locationLinks', path: '/masterdata/location-links', element: <EntityPage config={locationLinksConfig} /> },
       { key: 'huTypes', path: '/masterdata/hu-types', element: <EntityPage config={huTypesConfig} /> },
     ],
   },

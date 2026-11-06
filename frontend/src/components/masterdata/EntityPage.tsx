@@ -10,16 +10,18 @@ import {
 } from '@mui/material'
 import {
   ColumnsPanelTrigger, DataGrid, Toolbar, ToolbarButton,
-  type GridColDef, type GridPaginationModel, type GridRenderCellParams, type GridSortModel,
+  type GridColDef, type GridPaginationModel, type GridRenderCellParams, type GridRowSelectionModel,
+  type GridSortModel,
 } from '@mui/x-data-grid'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCan } from '../../api/auth'
-import { apiDownload } from '../../api/client'
-import { MD, useDeleteRecord, useMasterList, type ListParams } from '../../api/masterdata'
+import { api, apiDownload } from '../../api/client'
+import { MD, useDeleteRecord, useMasterList, useOptions, type ListParams } from '../../api/masterdata'
 import EntityDrawer from './EntityDrawer'
 import { errorText } from './errorText'
-import type { EntityConfig, Row } from './types'
+import type { BulkAction, EntityConfig, FilterDef, Row } from './types'
 
 function GridToolbar() {
   const { t } = useTranslation()
@@ -31,6 +33,21 @@ function GridToolbar() {
         </ColumnsPanelTrigger>
       </Tooltip>
     </Toolbar>
+  )
+}
+
+const EMPTY_SELECTION: GridRowSelectionModel = { type: 'include', ids: new Set() }
+
+/** A drop-down filter whose choices are the records of another (small) table, e.g. the areas. */
+function RefFilter({ filter, value, onChange }: { filter: FilterDef; value: string; onChange: (v: string) => void }) {
+  const { t } = useTranslation()
+  const options = useOptions<{ id: number; code: string }>(filter.refPath ?? '')
+  return (
+    <TextField select size="small" label={t(`md.fields.${filter.name}`)} value={value}
+      onChange={(e) => onChange(e.target.value)} sx={{ minWidth: 180 }}>
+      <MenuItem value="">{t('md.all')}</MenuItem>
+      {(options.data?.items ?? []).map((o) => <MenuItem key={o.id} value={String(o.id)}>{o.code}</MenuItem>)}
+    </TextField>
   )
 }
 
@@ -48,6 +65,13 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
   const [toDelete, setToDelete] = useState<Row | null>(null)
   const [notice, setNotice] = useState<{ text: string; severity: 'success' | 'error' } | null>(null)
   const [exportAnchor, setExportAnchor] = useState<HTMLElement | null>(null)
+  const [selection, setSelection] = useState<GridRowSelectionModel>(EMPTY_SELECTION)
+  const [bulkAsk, setBulkAsk] = useState<BulkAction | null>(null)
+  const [reason, setReason] = useState('')
+  const [bulkBusy, setBulkBusy] = useState(false)
+  const qc = useQueryClient()
+  const bulk = canEdit ? config.bulk : undefined
+  const selectedIds = [...selection.ids].map(Number)
 
   // Wait a moment after typing before asking the server.
   useEffect(() => {
@@ -76,7 +100,7 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
       renderCell: (p: GridRenderCellParams<Row>) => {
         const v = p.row[c.field]
         if (c.type === 'boolean') return v ? t('md.yes') : t('md.no')
-        if (v === null || v === undefined || v === '') return ''
+        if (v === null || v === undefined || v === '') return c.emptyKey ? t(c.emptyKey) : ''
         return c.optionsLabelKey ? t(`${c.optionsLabelKey}.${String(v)}`, { defaultValue: String(v) }) : String(v)
       },
     }))
@@ -112,6 +136,34 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
     () => Object.fromEntries(config.columns.filter((c) => c.hiddenByDefault).map((c) => [c.field, false])),
     [config],
   )
+
+  async function runBulk(action: BulkAction, why: string) {
+    if (!bulk) return
+    setBulkBusy(true)
+    try {
+      const result = await api<{ updated: number }>(bulk.path, {
+        method: 'POST',
+        body: { ids: selectedIds, action: action.action, reason: why.trim() || undefined },
+      })
+      await qc.invalidateQueries({ queryKey: ['md', config.path] })
+      setSelection(EMPTY_SELECTION)
+      setBulkAsk(null)
+      setReason('')
+      setNotice({ text: t('md.bulk.done', { count: result.updated }), severity: 'success' })
+    } catch (e) {
+      setNotice({ text: errorText(t, e), severity: 'error' })
+      setBulkAsk(null)
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
+  function startBulk(action: BulkAction) {
+    if (action.needsReason) {
+      setReason('')
+      setBulkAsk(action)
+    } else void runBulk(action, '')
+  }
 
   async function download(format: 'csv' | 'xlsx') {
     setExportAnchor(null)
@@ -154,10 +206,21 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
 
       <Stack direction="row" spacing={2} sx={{ mb: 2, flexWrap: 'wrap', rowGap: 1.5 }}>
         <TextField
-          size="small" label={t('md.search')} value={search} onChange={(e) => setSearch(e.target.value)}
+          size="small" label={t(config.searchKey ?? 'md.search')} value={search} onChange={(e) => setSearch(e.target.value)}
           sx={{ minWidth: { xs: '100%', sm: 280 } }}
         />
         {config.filters?.map((f) => {
+          const change = (v: string) => {
+            setFilters((p) => ({ ...p, [f.name]: v }))
+            setPaging((p) => ({ ...p, page: 0 }))
+          }
+          if (f.type === 'ref') return <RefFilter key={f.name} filter={f} value={filters[f.name] ?? ''} onChange={change} />
+          if (f.type === 'integer') {
+            return (
+              <TextField key={f.name} size="small" type="number" label={t(`md.fields.${f.name}`)}
+                value={filters[f.name] ?? ''} onChange={(e) => change(e.target.value)} sx={{ width: 140 }} />
+            )
+          }
           const options = f.type === 'boolean' ? ['true', 'false'] : (f.options ?? [])
           return (
             <TextField
@@ -181,6 +244,20 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
 
       {list.isError && <Alert severity="error" sx={{ mb: 2 }}>{errorText(t, list.error)}</Alert>}
 
+      {bulk && selectedIds.length > 0 && (
+        <Paper variant="outlined" sx={{ p: 1.5, mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+          <Typography sx={{ fontWeight: 600, mr: 1 }}>{t('md.bulk.selected', { count: selectedIds.length })}</Typography>
+          {bulk.actions.map((a) => (
+            <Button key={a.action} size="small" variant="outlined" color="secondary" disabled={bulkBusy || selectedIds.length > bulk.max}
+              onClick={() => startBulk(a)}>
+              {t(a.labelKey)}
+            </Button>
+          ))}
+          <Button size="small" variant="text" color="secondary" onClick={() => setSelection(EMPTY_SELECTION)}>{t('md.bulk.clear')}</Button>
+          {selectedIds.length > bulk.max && <Alert severity="warning" sx={{ py: 0 }}>{t('md.bulk.tooMany', { max: bulk.max })}</Alert>}
+        </Paper>
+      )}
+
       <Paper variant="outlined" sx={{ width: '100%' }}>
         <DataGrid<Row>
           rows={list.data?.items ?? []}
@@ -197,6 +274,10 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
           pageSizeOptions={[25, 50, 100, 200]}
           initialState={{ columns: { columnVisibilityModel: columnVisibility } }}
           disableRowSelectionOnClick
+          checkboxSelection={Boolean(bulk)}
+          keepNonExistentRowsSelected
+          rowSelectionModel={selection}
+          onRowSelectionModelChange={setSelection}
           showToolbar
           slots={{ toolbar: GridToolbar }}
           autoHeight
@@ -208,11 +289,27 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
 
       <EntityDrawer config={config} target={target} canEdit={canEdit} onClose={() => setTarget(null)} />
 
+      <Dialog open={bulkAsk !== null} onClose={() => setBulkAsk(null)} fullWidth maxWidth="xs">
+        <DialogTitle>{bulkAsk ? t(bulkAsk.labelKey) : ''}</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>{t('md.bulk.reasonText', { count: selectedIds.length })}</DialogContentText>
+          <TextField autoFocus fullWidth required label={t('md.fields.blockReason')} value={reason}
+            onChange={(e) => setReason(e.target.value)} slotProps={{ htmlInput: { maxLength: 255 } }} />
+        </DialogContent>
+        <DialogActions>
+          <Button color="secondary" onClick={() => setBulkAsk(null)}>{t('md.cancel')}</Button>
+          <Button variant="contained" disabled={reason.trim() === '' || bulkBusy}
+            onClick={() => bulkAsk && void runBulk(bulkAsk, reason)}>
+            {t('md.bulk.apply')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={toDelete !== null} onClose={() => setToDelete(null)}>
         <DialogTitle>{t('md.deleteTitle')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {t('md.deleteText', { name: String(toDelete?.code ?? toDelete?.id ?? '') })}
+            {t('md.deleteText', { name: toDelete ? (config.rowLabel?.(toDelete) ?? String(toDelete.code ?? toDelete.id)) : '' })}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

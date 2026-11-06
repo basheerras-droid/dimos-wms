@@ -46,7 +46,9 @@
     "locationTypes": "Location types",
     "huTypes": "Handling-unit types",
     "collapse": "Collapse menu",
-    "expand": "Expand menu"
+    "expand": "Expand menu",
+    "locations": "Locations",
+    "locationLinks": "Location links"
   },
   "user": {
     "menu": "User menu",
@@ -107,7 +109,18 @@
       "storage": "Handling units are stored here.",
       "transfer": "A hand-over position between pieces of equipment.",
       "capacityHu": "How many handling units fit on one location of this type.",
-      "container": "Other handling units can be placed in or on this type."
+      "container": "Other handling units can be placed in or on this type.",
+      "levelNo": "Floor or storage level; locations are drawn per level in the layout view.",
+      "position": "Position in millimetres, used by the layout view.",
+      "enabled": "A disabled location is switched off completely.",
+      "blockedIn": "Nothing may be put into this location.",
+      "blockedOut": "Nothing may be taken out of this location.",
+      "blockReason": "Required when the location is blocked.",
+      "externalRef": "Address of this location in the PLC or host system.",
+      "extAttributes": "Project-specific extra fields as JSON text, e.g. {\"zone\":\"cold\"}.",
+      "huTypeEmpty": "Leave empty if the link is valid for all handling-unit types.",
+      "linkEquipment": "The equipment that performs the move (optional).",
+      "cost": "Routing cost; routes with the lowest total cost are preferred."
     },
     "areaTypes": {
       "INBOUND": "Inbound",
@@ -130,7 +143,36 @@
       "heightMm": "Height (mm)",
       "tareKg": "Tare (kg)",
       "maxGrossKg": "Max. gross (kg)",
-      "container": "Container"
+      "container": "Container",
+      "areaId": "Area",
+      "areaCode": "Area",
+      "locationTypeId": "Location type",
+      "locationTypeCode": "Location type",
+      "levelNo": "Level",
+      "aisle": "Aisle",
+      "side": "Side",
+      "columnNo": "Column",
+      "rowNo": "Row",
+      "xMm": "X (mm)",
+      "yMm": "Y (mm)",
+      "zMm": "Z (mm)",
+      "maxWeightKg": "Max. weight (kg)",
+      "enabled": "Enabled",
+      "blockedIn": "Blocked inbound",
+      "blockedOut": "Blocked outbound",
+      "blockReason": "Block reason",
+      "externalRef": "External reference",
+      "extAttributes": "Extra attributes (JSON)",
+      "blocked": "Blocked",
+      "fromLocationId": "From location",
+      "fromLocationCode": "From location",
+      "toLocationId": "To location",
+      "toLocationCode": "To location",
+      "huTypeId": "Handling-unit type",
+      "huTypeCode": "Handling-unit type",
+      "equipmentId": "Equipment",
+      "equipmentCode": "Equipment",
+      "cost": "Cost"
     },
     "areas": {
       "title": "Areas",
@@ -152,6 +194,36 @@
       "new": "New handling-unit type",
       "edit": "Edit handling-unit type",
       "view": "Handling-unit type"
+    },
+    "allTypes": "All types",
+    "bulk": {
+      "selected": "{{count}} selected",
+      "clear": "Clear selection",
+      "tooMany": "At most {{max}} rows can be changed at once.",
+      "done": "{{count}} location(s) updated.",
+      "reasonText": "This will be applied to {{count}} selected location(s). Enter the reason; it is saved with each location.",
+      "apply": "Apply",
+      "blockIn": "Block inbound",
+      "unblockIn": "Unblock inbound",
+      "blockOut": "Block outbound",
+      "unblockOut": "Unblock outbound",
+      "enable": "Enable",
+      "disable": "Disable"
+    },
+    "locations": {
+      "title": "Locations",
+      "add": "New location",
+      "new": "New location",
+      "edit": "Edit location",
+      "view": "Location"
+    },
+    "locationLinks": {
+      "title": "Location links",
+      "add": "New link",
+      "new": "New link",
+      "edit": "Edit link",
+      "view": "Link",
+      "search": "Search from / to location code"
     }
   },
   "placeholder": {
