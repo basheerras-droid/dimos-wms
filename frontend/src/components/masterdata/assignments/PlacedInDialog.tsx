@@ -65,7 +65,7 @@ function Form({ row, path, data, options, canEdit, onClose }: {
     },
     onError: (e) => {
       const detail = e instanceof ApiError ? (e.fieldErrors.placedIn ?? e.otherDetails.join(' ')) : ''
-      setError(detail ? `${errorText(t, e)} ${detail}` : errorText(t, e))
+      setError(detail || errorText(t, e)) // the specific reason is more useful than the general text
     },
   })
 

@@ -1,5 +1,13 @@
 /** Small fetch wrapper: same-origin cookies, CSRF header for writes, JSON in and out. */
 
+/** Server messages are written in lower case ("this code is already used"); show them as a sentence. */
+function sentence(text: string): string {
+  const t = text.trim()
+  if (!t) return t
+  const capital = t.charAt(0).toUpperCase() + t.slice(1)
+  return /[.!?]$/.test(capital) ? capital : `${capital}.`
+}
+
 export class ApiError extends Error {
   status: number
   code: string | undefined
@@ -16,8 +24,8 @@ export class ApiError extends Error {
     this.otherDetails = []
     for (const d of details) {
       const m = /^([A-Za-z][A-Za-z0-9_.]*): (.*)$/.exec(d)
-      if (m) this.fieldErrors[m[1]] = m[2]
-      else this.otherDetails.push(d)
+      if (m) this.fieldErrors[m[1]] = sentence(m[2])
+      else this.otherDetails.push(sentence(d))
     }
   }
 
