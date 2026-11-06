@@ -5,6 +5,10 @@
   retention (`-KeepDays`, default 14), log, exit code 1 on failure. `deploy/README.md` section 6: Task Scheduler setup on
   WMS-TEST-SRV (daily 02:00, SYSTEM), manual run on the laptop, test restore into `wms_restore_test`.
 - Task description for Step E (master data) added: `docs/tasks/STEP-E-master-data.md`.
+- Step E1: Flyway V4 adds master-data tables (`area`, `location_type`, `hu_type`, `location`, `location_link`,
+  `equipment_type`, `equipment`, `equipment_location`, `location_type_hu_type`, `hu_type_nesting`), the 13 seeded
+  equipment types (`is_seeded`) and permissions MASTERDATA_VIEW (all roles) / MASTERDATA_EDIT (SUPER_ADMIN, ADMIN).
+  Approved design saved in `docs/design/E1-masterdata-tables.md`.
 
 ## 2026-11-05
 - Brand rules: only the standard DIMOS logo, on a white top bar; negative logo removed.
