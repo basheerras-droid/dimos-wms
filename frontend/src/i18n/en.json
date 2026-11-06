@@ -52,7 +52,9 @@
     "locations": "Locations",
     "locationLinks": "Location links",
     "equipmentMaster": "Equipment",
-    "equipmentTypes": "Equipment types"
+    "equipmentTypes": "Equipment types",
+    "import": "Import",
+    "validation": "Check configuration"
   },
   "user": {
     "menu": "User menu",
@@ -278,6 +280,92 @@
       "placedInTitle": "May be placed in / on",
       "placedInHelp": "Tick the handling-unit types that {{code}} may be placed in or on (for example a carton on a pallet). Optionally limit the quantity per carrier.",
       "badQty": "The maximum quantity must be a whole number of at least 1, or empty for no limit."
+    },
+    "import": {
+      "title": "Import from spreadsheet",
+      "intro": "Load master data from a CSV or Excel file. Nothing is changed until you have checked the file and pressed Apply.",
+      "stepChoose": "Choose table and get the template",
+      "stepCheck": "Upload and check",
+      "stepApply": "Apply",
+      "step1": "1. Choose the table and download the template",
+      "step2": "2. Upload the file and check it",
+      "step3": "3. Apply",
+      "table": "Table",
+      "templateCsv": "Template (CSV)",
+      "templateXlsx": "Template (Excel)",
+      "exportCurrent": "Download current data",
+      "orderHint": "Load the tables in the order of this list (areas first, assignments last): a row can only refer to records that already exist. A row whose code already exists updates that record; a column left out of the file keeps its stored value.",
+      "columnsTitle": "Columns of this table ({{count}})",
+      "colName": "Column",
+      "colRequired": "Required",
+      "colExample": "Example",
+      "colMeaning": "Meaning",
+      "chooseFile": "Choose file...",
+      "noFile": "No file chosen (.csv or .xlsx, up to 10 MB)",
+      "check": "Check file",
+      "checking": "Checking...",
+      "row": "Row",
+      "result": "Result",
+      "record": "Record",
+      "message": "Message",
+      "status": {
+        "CREATE": "New",
+        "UPDATE": "Update",
+        "ADD": "Add",
+        "UNCHANGED": "Unchanged",
+        "ERROR": "Error"
+      },
+      "countCreated": "{{count}} new",
+      "countUpdated": "{{count}} to update",
+      "countAdded": "{{count}} to add",
+      "countUnchanged": "{{count}} unchanged",
+      "countErrors": "{{count}} with errors",
+      "onlyErrors": "Only errors",
+      "fileProblems": "The file cannot be used:",
+      "nothingToDo": "The file is correct but contains nothing new: all rows are already in the system as they are.",
+      "readyToApply": "The file is correct. Nothing has been changed yet - press Apply in step 3 to save it.",
+      "fixFirst": "Correct the rows with errors in the file and check it again. Apply is only possible when there are no errors.",
+      "truncated": "Only the first {{count}} rows are listed (all errors are always shown).",
+      "applyHelp": "All rows are saved together. If anything goes wrong, nothing is saved.",
+      "apply": "Apply",
+      "applying": "Applying...",
+      "confirmTitle": "Apply the import?",
+      "confirmText": "{{table}}: {{created}} new, {{updated}} updated, {{added}} added. All rows are saved together or not at all, and every change is written to the audit log.",
+      "applied": "Import applied: {{created}} new, {{updated}} updated, {{added}} added, {{unchanged}} unchanged.",
+      "refused": "The import was refused and nothing was saved. See the rows with errors below.",
+      "entities": {
+        "areas": "Areas",
+        "location-types": "Location types",
+        "hu-types": "Handling-unit types",
+        "locations": "Locations",
+        "location-links": "Location links",
+        "equipment": "Equipment",
+        "equipment-locations": "Equipment - locations",
+        "location-type-hu-types": "Location type - handling-unit types",
+        "hu-type-nesting": "Handling-unit nesting"
+      }
+    },
+    "validation": {
+      "title": "Check configuration",
+      "intro": "Looks for the mistakes that most often break a go-live: links to nowhere, storage that nothing can reach, equipment without locations, and more. This only reads - nothing is changed.",
+      "run": "Check again",
+      "status": {
+        "PASS": "OK",
+        "WARNING": "Warning",
+        "ERROR": "Error"
+      },
+      "overall": {
+        "PASS": "The configuration is in order",
+        "WARNING": "The configuration has warnings",
+        "ERROR": "The configuration has errors"
+      },
+      "summary": "{{errors}} rule(s) with errors, {{warnings}} with warnings, {{passed}} passed.",
+      "checked": "Checked {{locations}} locations, {{links}} links and {{equipment}} pieces of equipment in {{ms}} ms.",
+      "count": "{{count}} found",
+      "passedTitle": "Rules that passed ({{count}})",
+      "truncated": "Showing the first {{shown}} of {{count}}.",
+      "openRecord": "Open record",
+      "wholePlant": "Whole plant"
     }
   },
   "placeholder": {

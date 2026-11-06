@@ -50,6 +50,14 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Step E5.4 (front end): Master data -> **Import** (needs MASTERDATA_EDIT): choose the table (listed in load order), download the
+  template (CSV/Excel) or the current data, see what each column means, upload a file and "Check file" (dry run: counts of new /
+  update / add / unchanged / errors, per-row table with an "only errors" switch, file-level problems such as unknown or missing
+  columns), then **Apply** after a confirmation (all rows or none; a refused apply shows the wrong rows). Master data -> **Check
+  configuration**: overall result, rules with errors/warnings first (expanded for errors) and each finding linked to its record
+  (`?open=<id>` opens the record's drawer on the list page), passed rules listed below, "Check again" button, shows what was
+  checked and how long it took. Fix: every master-data page now has its own React key, so search text, filters and sort of one
+  screen can no longer leak into the next one.
 - Step E5.3: Master data -> Equipment (static configuration; the top-level "Equipment (WCS)" entry stays for live status in
   Step F/H) with list, filters (type, area, enabled) and drawer (type, area, parent equipment, PLC connection, external reference,
   extra attributes); Equipment types screen (built-in types shown with a lock, read-only; custom types can be added, renamed and

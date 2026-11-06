@@ -9,6 +9,8 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import type { ReactElement } from 'react'
 import EntityPage from './masterdata/EntityPage'
 import EquipmentTypesPage from './masterdata/EquipmentTypesPage'
+import ImportPage from './masterdata/ImportPage'
+import ValidationPage from './masterdata/ValidationPage'
 import {
   areasConfig, equipmentConfig, huTypesConfig, locationLinksConfig, locationsConfig, locationTypesConfig,
 } from './masterdata/configs'
@@ -37,14 +39,16 @@ export const navItems: NavItem[] = [
     icon: <AccountTreeIcon />,
     permission: 'MASTERDATA_VIEW',
     children: [
-      { key: 'areas', path: '/masterdata/areas', element: <EntityPage config={areasConfig} /> },
-      { key: 'locationTypes', path: '/masterdata/location-types', element: <EntityPage config={locationTypesConfig} /> },
-      { key: 'locations', path: '/masterdata/locations', element: <EntityPage config={locationsConfig} /> },
-      { key: 'locationLinks', path: '/masterdata/location-links', element: <EntityPage config={locationLinksConfig} /> },
-      { key: 'huTypes', path: '/masterdata/hu-types', element: <EntityPage config={huTypesConfig} /> },
+      { key: 'areas', path: '/masterdata/areas', element: <EntityPage key="areasConfig" config={areasConfig} /> },
+      { key: 'locationTypes', path: '/masterdata/location-types', element: <EntityPage key="locationTypesConfig" config={locationTypesConfig} /> },
+      { key: 'locations', path: '/masterdata/locations', element: <EntityPage key="locationsConfig" config={locationsConfig} /> },
+      { key: 'locationLinks', path: '/masterdata/location-links', element: <EntityPage key="locationLinksConfig" config={locationLinksConfig} /> },
+      { key: 'huTypes', path: '/masterdata/hu-types', element: <EntityPage key="huTypesConfig" config={huTypesConfig} /> },
       // static configuration of the equipment; the top-level "Equipment (WCS)" entry is for live status (later step)
-      { key: 'equipmentMaster', path: '/masterdata/equipment', element: <EntityPage config={equipmentConfig} /> },
+      { key: 'equipmentMaster', path: '/masterdata/equipment', element: <EntityPage key="equipmentConfig" config={equipmentConfig} /> },
       { key: 'equipmentTypes', path: '/masterdata/equipment-types', element: <EquipmentTypesPage /> },
+      { key: 'import', path: '/masterdata/import', permission: 'MASTERDATA_EDIT', element: <ImportPage /> },
+      { key: 'validation', path: '/masterdata/validation', element: <ValidationPage /> },
     ],
   },
   { key: 'reports', path: '/reports', icon: <AssessmentIcon /> },

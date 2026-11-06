@@ -16,9 +16,10 @@ import {
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router'
 import { useCan } from '../../api/auth'
 import { api, apiDownload } from '../../api/client'
-import { MD, useDeleteRecord, useMasterList, useOptions, type ListParams } from '../../api/masterdata'
+import { fetchRecord, MD, useDeleteRecord, useMasterList, useOptions, type ListParams } from '../../api/masterdata'
 import EntityDrawer from './EntityDrawer'
 import { errorText } from './errorText'
 import type { BulkAction, EntityConfig, FilterDef, Row, RowAction } from './types'
@@ -58,8 +59,9 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
 
   const [paging, setPaging] = useState<GridPaginationModel>({ page: 0, pageSize: 25 })
   const [sortModel, setSortModel] = useState<GridSortModel>([])
-  const [search, setSearch] = useState('')
-  const [q, setQ] = useState('')
+  const [urlParams, setUrlParams] = useSearchParams()
+  const [search, setSearch] = useState(() => urlParams.get('q') ?? '')
+  const [q, setQ] = useState(() => urlParams.get('q') ?? '')
   const [filters, setFilters] = useState<Record<string, string>>({})
   const [target, setTarget] = useState<Row | 'new' | null>(null)
   const [toDelete, setToDelete] = useState<Row | null>(null)
@@ -82,6 +84,18 @@ export default function EntityPage({ config }: { config: EntityConfig }) {
     }, 300)
     return () => clearTimeout(id)
   }, [search])
+
+  // A link such as /masterdata/locations?open=123 (e.g. from "Check configuration") opens that record.
+  const openId = urlParams.get('open')
+  useEffect(() => {
+    if (!openId) return
+    let cancelled = false
+    fetchRecord<Row>(config.path, Number(openId))
+      .then((record) => { if (!cancelled) setTarget(record) })
+      .catch(() => undefined)
+      .finally(() => { if (!cancelled) setUrlParams({}, { replace: true }) })
+    return () => { cancelled = true }
+  }, [openId, config.path, setUrlParams])
 
   const sort = sortModel.length > 0 ? `${sortModel[0].field},${sortModel[0].sort}` : config.defaultSort
   const params: ListParams = { q, page: paging.page, size: paging.pageSize, sort, ...filters }
