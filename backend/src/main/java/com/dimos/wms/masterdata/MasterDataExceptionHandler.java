@@ -24,6 +24,12 @@ class MasterDataExceptionHandler {
                 .body(new ApiError(ex.code, ex.getMessage(), ex.details, MDC.get("correlationId")));
     }
 
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiError> tooBig(org.springframework.web.multipart.MaxUploadSizeExceededException ex) {
+        return business(new MasterDataException(org.springframework.http.HttpStatus.CONTENT_TOO_LARGE,
+                "FILE_TOO_LARGE", "The file is too large (maximum 10 MB).", List.of()));
+    }
+
     /** Two people saved the same record at the same moment. */
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     ResponseEntity<ApiError> stale(ObjectOptimisticLockingFailureException ex) {

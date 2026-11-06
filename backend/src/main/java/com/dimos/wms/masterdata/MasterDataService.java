@@ -95,6 +95,9 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
         }
         R before = toResponse(entity);
         apply(entity, request, who);
+        if (toResponse(entity).equals(before)) {
+            return before; // nothing really changed: no new version, no audit row
+        }
         entity.stamp(who.username());
         E saved = repository.saveAndFlush(entity);
         R after = toResponse(saved);
@@ -159,7 +162,7 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
     }
 
     protected void record(String action, WmsUserPrincipal who, Object entityId, Object before, Object after) {
-        audit.record(new AuditEvent(who.username(), action, who.siteId(), entityType(), String.valueOf(entityId),
+        AuditBuffer.record(audit, new AuditEvent(who.username(), action, who.siteId(), entityType(), String.valueOf(entityId),
                 toJson(before), toJson(after), null, remoteAddr(), null));
     }
 

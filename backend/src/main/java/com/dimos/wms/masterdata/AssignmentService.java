@@ -213,7 +213,7 @@ class AssignmentService {
     }
 
     private void record(String action, String entityType, Long id, Object before, Object after, WmsUserPrincipal who) {
-        audit.record(new AuditEvent(who.username(), action, who.siteId(), entityType, String.valueOf(id),
+        AuditBuffer.record(audit, new AuditEvent(who.username(), action, who.siteId(), entityType, String.valueOf(id),
                 limit(json.writeValueAsString(before)), limit(json.writeValueAsString(after)), null,
                 MasterDataService.remoteAddr(), null));
     }

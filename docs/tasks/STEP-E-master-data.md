@@ -53,7 +53,9 @@ All business tables: `site_id`, `version`, `created_at/by`, `updated_at/by`. Cod
 
 ## E4 - Configuration validator
 Endpoint and screen "Check configuration" that reports PASS / WARNING / ERROR per rule, with links to the records:
-- links pointing to missing or disabled locations; duplicate links
+- links pointing to missing or disabled locations; duplicate links (same from + to + HU type + equipment)
+- WARNING when the same from/to pair has both an all-types link (HU type empty) and a type-specific link
+  (owner's addition, 2026-11-06)
 - locations with no incoming or no outgoing links (except allowed dead ends such as storage bins)
 - storage locations unreachable from any inbound location, or with no path to any outbound location
 - location types that accept no HU type; HU types accepted nowhere

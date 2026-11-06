@@ -94,7 +94,7 @@ class LocationLinkService
     }
 
     /** "reference equals id", where a missing id means "the reference is empty". */
-    private static Specification<LocationLink> refEquals(String field, Long id) {
+    static Specification<LocationLink> refEquals(String field, Long id) {
         return (root, q, cb) -> id == null ? cb.isNull(root.get(field)) : cb.equal(root.get(field).get("id"), id);
     }
 

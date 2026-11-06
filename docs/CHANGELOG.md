@@ -19,6 +19,14 @@
   SUPER_ADMIN may add/rename/delete; the 13 built-in types keep their code and cannot be deleted. Every create/update/delete
   is written to `audit_log` with before/after JSON. Login session now carries permissions (`/api/auth/me` returns
   `permissions`); endpoints use MASTERDATA_VIEW / MASTERDATA_EDIT.
+- Step E3: spreadsheet import/export for 9 tables (areas, location-types, hu-types, locations, location-links, equipment,
+  equipment-locations, location-type-hu-types, hu-type-nesting) as CSV (comma/semicolon/tab, UTF-8 or Windows-1252) or XLSX
+  (Apache POI 5.5.1, commons-csv 1.14.1, both Apache 2.0). `POST /api/masterdata/import/{type}?dryRun=true|false`:
+  dry run runs the real import in a transaction that is always rolled back; Apply writes all rows or nothing (HTTP 422 if any
+  row is wrong) and writes the audit rows only after a successful commit. A row whose code exists updates it (unchanged rows
+  are left alone: no new version, no audit); a column left out of the file keeps the stored value. Templates:
+  `GET /import/{type}/template`, exports: `GET /export/{type}`, table list: `GET /import/types`. Limits: 10 MB, 50 000 rows.
+  CSV exports defuse spreadsheet formulas (leading ' on =, +, @). An update with no real change no longer creates a new version.
 
 ## 2026-11-05
 - Brand rules: only the standard DIMOS logo, on a white top bar; negative logo removed.

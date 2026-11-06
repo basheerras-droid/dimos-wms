@@ -11,6 +11,10 @@ spring:
     schemas: wms
     default-schema: wms
     locations: classpath:db/migration/common,classpath:db/migration/postgresql
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
   jpa:
     open-in-view: false
     hibernate:

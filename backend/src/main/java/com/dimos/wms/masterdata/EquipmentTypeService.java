@@ -104,7 +104,7 @@ class EquipmentTypeService {
     }
 
     private void record(String action, WmsUserPrincipal who, Object id, Object before, Object after) {
-        audit.record(new AuditEvent(who.username(), action, who.siteId(), "equipment_type", String.valueOf(id),
+        AuditBuffer.record(audit, new AuditEvent(who.username(), action, who.siteId(), "equipment_type", String.valueOf(id),
                 before == null ? null : json.writeValueAsString(before),
                 after == null ? null : json.writeValueAsString(after), null,
                 MasterDataService.remoteAddr(), null));

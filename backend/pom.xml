@@ -29,6 +29,8 @@
 	<properties>
 		<java.version>25</java.version>
 		<spring-modulith.version>2.1.1</spring-modulith.version>
+		<poi.version>5.5.1</poi.version> <!-- Apache POI: XLSX import/export (Apache 2.0) -->
+		<commons-csv.version>1.14.1</commons-csv.version> <!-- CSV import/export (Apache 2.0) -->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -72,6 +74,16 @@
 			<artifactId>spring-modulith-starter-jpa</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>${poi.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>${commons-csv.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
