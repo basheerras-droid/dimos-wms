@@ -84,6 +84,9 @@ Menu changes (all text through i18n, brand rules from CLAUDE.md):
 - A documented way to load a project's data set (admin screen button "Load project data" or a command), so later
   `projects/ekfc/` can be loaded the same way. Customer-owned material (PLC programs, drawings) never goes in Git.
 - The configuration validator must report PASS (warnings allowed) for the demo data.
+- Also measure import time (dry run and apply) with a larger generated set - e.g. 5,000 locations and 10,000 links -
+  because the first real project data (DFC) will be that size. Record the times in `docs/test-evidence/STEP-E.md`
+  and optimise the importer if it is slow (owner's request, 2026-11-06).
 
 ## E7 - Tests, docs and acceptance (record results in docs/test-evidence/STEP-E.md)
 1. Unit and integration tests for services, import (good file, bad file) and validator rules.
