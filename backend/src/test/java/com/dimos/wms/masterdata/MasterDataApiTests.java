@@ -254,10 +254,10 @@ class MasterDataApiTests {
 
     @Test
     void equipmentTypesAreProtected() throws Exception {
-        // 13 built-in types are listed
+        // 17 built-in types are listed (13 from V4, 4 from V5)
         String list = mvc.perform(get(BASE + "/equipment-types").with(authentication(VIEWER))).andReturn()
                 .getResponse().getContentAsString();
-        assertThat((List<?>) JsonPath.read(list, "$[?(@.seeded == true)]")).hasSize(13);
+        assertThat((List<?>) JsonPath.read(list, "$[?(@.seeded == true)]")).hasSize(17);
         long conveyor = ((Number) ((List<?>) JsonPath.read(list, "$[?(@.code == 'CONVEYOR')].id")).get(0)).longValue();
 
         // only SUPER_ADMIN can add, change or delete

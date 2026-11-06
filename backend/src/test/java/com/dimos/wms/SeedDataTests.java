@@ -30,7 +30,7 @@ class SeedDataTests {
 	@Test
 	void masterDataSeedExists() {
 		assertThat(jdbc.queryForObject("select count(*) from equipment_type where is_seeded = true", Integer.class))
-				.isEqualTo(13);
+				.isEqualTo(17);
 		assertThat(jdbc.queryForList("""
 				select r.code from role_permission rp
 				join app_role r on r.id = rp.role_id

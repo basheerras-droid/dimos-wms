@@ -17,7 +17,7 @@ Implemented as `backend/src/main/resources/db/migration/common/V4__masterdata.sq
 | hu_type | code, name, length_mm, width_mm, height_mm, tare_kg, max_gross_kg, is_container | site |
 | location | code, name, x_mm, y_mm, z_mm, level_no, aisle, side, column_no, row_no, max_weight_kg, enabled, blocked_in, blocked_out, block_reason, external_ref, ext_attributes | area, location_type |
 | location_link | cost, enabled | from_location, to_location, hu_type (empty = all types), equipment (optional) |
-| equipment_type | code, name, is_seeded; shared list for all sites, seeded with the 13 types | - |
+| equipment_type | code, name, is_seeded; shared list for all sites, seeded with 13 types in V4 and 4 more in V5 (ETV, MONORAIL, TURNTABLE, WASHER) | - |
 | equipment | code, name, plc_connection, enabled, external_ref, ext_attributes | equipment_type, area (optional), parent equipment (optional) |
 | equipment_location | key (equipment, location) | equipment, location |
 | location_type_hu_type | key (location_type, hu_type) | location_type, hu_type |
@@ -34,6 +34,6 @@ Implemented as `backend/src/main/resources/db/migration/common/V4__masterdata.sq
 changed or be deleted - enforced in E2 (backend) and E5 (UI).
 
 ## Implementation notes (small additions beyond the proposal)
-- `equipment_type` has an `id` (seed ids 1-13, sequence from 1000) so equipment can reference it by foreign key.
+- `equipment_type` has an `id` (seed ids 1-17, sequence from 1000) so equipment can reference it by foreign key.
 - CHECK constraints: capacity >= 0, link cost >= 0, a link cannot point to itself, a HU type cannot nest in itself,
   `max_qty` > 0 when given.

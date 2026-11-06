@@ -34,6 +34,8 @@
   with no path to an outbound location, location types accepting no HU type (ERROR when used), HU types accepted nowhere,
   equipment without locations, a location claimed by two equipment of the same type, locations at the same position/level,
   locations without x/y. Measured: 20 001 locations + 39 998 links in 215 ms.
+- Flyway V5: four more built-in equipment types (ETV, MONORAIL, TURNTABLE, WASHER; 17 in total). CLAUDE.md now lists the three
+  reference projects (EKFC, DFC, INL).
 
 ## 2026-11-05
 - Brand rules: only the standard DIMOS logo, on a white top bar; negative logo removed.

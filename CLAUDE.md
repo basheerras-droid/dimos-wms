@@ -70,3 +70,12 @@ English, work in small steps, and tell him which machine each manual step runs o
   understand functions.
 - Free/open-source dependencies with commercial-friendly licences only (no MUI X Pro/Premium). Pin versions.
 - Keep a short changelog in `docs/CHANGELOG.md`.
+
+## Reference projects
+The product is designed so that these three customer projects can be delivered by configuration of the same base
+product. Use them to judge whether a feature or data-model decision is general enough. (Customer-owned material -
+PLC programs, drawings, data - never goes in Git.)
+- **EKFC** - monorail system with hangers/carts.
+- **DFC** - ULD/PMC transport and storage with ETVs (elevating transfer vehicles) and turntables. First real project data;
+  expected size about 5,000 locations and 10,000 links.
+- **INL** - pallet conveyors, stacker cranes and high-bay storage.
