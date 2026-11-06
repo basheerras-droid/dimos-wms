@@ -1,7 +1,6 @@
 package com.dimos.wms.identity;
 
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +41,6 @@ class UserAdminController {
     @GetMapping("/users/{id}")
     UserAdminService.UserView get(@PathVariable Long id, @AuthenticationPrincipal WmsUserPrincipal who) {
         return service.get(id, who);
-    }
-
-    @GetMapping("/roles")
-    List<UserAdminService.RoleView> roles() {
-        return service.roles();
     }
 
     /** The answer contains the temporary password once, so it must never be cached. */

@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** Read-only view of a permission (maintained by migrations). */
+/** A permission. The list is fixed in code ({@link PermissionCatalogue}); the table is the target of the role links. */
 @Entity
 @Table(name = "app_permission")
 class AppPermission {
@@ -16,10 +16,28 @@ class AppPermission {
     @Column(nullable = false, updatable = false, insertable = false)
     private String code;
 
+    @Column(updatable = false, insertable = false)
+    private String description;
+
+    @Column(nullable = false, updatable = false, insertable = false)
+    private String module;
+
     protected AppPermission() {
+    }
+
+    Long getId() {
+        return id;
     }
 
     String getCode() {
         return code;
+    }
+
+    String getDescription() {
+        return description;
+    }
+
+    String getModule() {
+        return module;
     }
 }

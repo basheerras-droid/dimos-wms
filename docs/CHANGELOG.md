@@ -50,6 +50,14 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Step E5.7.1 (Flyway V6): **Permissions and Roles**. Permission catalogue fixed in code (`PermissionCatalogue`: code, module,
+  description), checked against the database at start-up and by a test; new permissions ROLE_MANAGE, WORKSTATION_MANAGE,
+  PARAMETER_VIEW, PARAMETER_EDIT (default grants as agreed). Administration -> **Permissions**: read-only, grouped by module, shows
+  which roles hold each one. Administration -> **Roles**: tick matrix roles x permissions; the four built-in roles are locked
+  (`is_builtin`); custom roles can be created, copied, edited and deleted, by a SUPER_ADMIN only (also needs ROLE_MANAGE); deleting
+  a role in use says by whom; saving a role signs out its holders. A custom role code that would turn into a permission
+  authority (ROLE_ + code, e.g. "MANAGE") is refused. Audit: ROLE_CREATED / ROLE_UPDATED / ROLE_DELETED with before and after.
+  Test fix: `SecurityWebTests` has its own application context (the `csrf()` test helper permanently changes a shared one).
 - Step E5.6: **Master data -> Layout preview** (MASTERDATA_VIEW), read-only. Backend `/api/masterdata/layout/plan|racks|rack-face`
   (plain SQL, compact JSON). **Plan view**: one level at a time, locations by x / y coloured per area (legend chips hide / show an
   area), links as lines (dashed = disabled; arrows and location codes appear when zoomed in), disabled = hollow dashed, blocked =

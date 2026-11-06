@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /** Same JSON error shape as the rest of the API, for the user-administration endpoints. */
-@RestControllerAdvice(assignableTypes = UserAdminController.class)
+@RestControllerAdvice(basePackages = "com.dimos.wms.identity")
 @Order(Ordered.HIGHEST_PRECEDENCE)
 class UserAdminExceptionHandler {
 

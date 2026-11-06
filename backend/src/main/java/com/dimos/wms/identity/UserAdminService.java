@@ -57,9 +57,6 @@ class UserAdminService {
     record UserPage(List<UserView> items, long total, int page, int size) {
     }
 
-    record RoleView(String code, String name, String description) {
-    }
-
     record CreatedUser(UserView user, String temporaryPassword) {
     }
 
@@ -120,12 +117,6 @@ class UserAdminService {
     @Transactional(readOnly = true)
     public UserView get(Long id, WmsUserPrincipal who) {
         return view(load(id, who));
-    }
-
-    @Transactional(readOnly = true)
-    public List<RoleView> roles() {
-        return roles.findAll(Sort.by("id")).stream()
-                .map(r -> new RoleView(r.getCode(), r.getName(), r.getDescription())).toList();
     }
 
     // ---- changing ---------------------------------------------------------------------------------------

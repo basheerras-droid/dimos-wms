@@ -33,10 +33,31 @@ export interface AdminUser {
   updatedBy: string
 }
 
+export interface Permission {
+  code: string
+  module: string
+  description: string
+}
+
 export interface RoleInfo {
+  id: number
   code: string
   name: string
   description: string | null
+  /** Built-in roles are locked. */
+  builtin: boolean
+  permissions: string[]
+  userCount: number
+  groupCount: number
+  version: number
+}
+
+export interface RoleInput {
+  code: string
+  name: string
+  description: string | null
+  permissions: string[]
+  version?: number
 }
 
 export interface UserInput {
@@ -60,7 +81,35 @@ export function useRoles() {
   return useQuery<RoleInfo[]>({
     queryKey: ['admin-roles'],
     queryFn: () => api<RoleInfo[]>(`${ADMIN}/roles`),
+    staleTime: 30_000,
+  })
+}
+
+/** The fixed list of permissions of the product, with the module each belongs to. */
+export function usePermissions() {
+  return useQuery<Permission[]>({
+    queryKey: ['admin-permissions'],
+    queryFn: () => api<Permission[]>(`${ADMIN}/permissions`),
     staleTime: 5 * 60_000,
+  })
+}
+
+export function useSaveRole() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (v: { id?: number; body: RoleInput }) =>
+      v.id === undefined
+        ? api<RoleInfo>(`${ADMIN}/roles`, { method: 'POST', body: v.body })
+        : api<RoleInfo>(`${ADMIN}/roles/${v.id}`, { method: 'PUT', body: v.body }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin-roles'] }),
+  })
+}
+
+export function useDeleteRole() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => api<void>(`${ADMIN}/roles/${id}`, { method: 'DELETE' }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['admin-roles'] }),
   })
 }
 

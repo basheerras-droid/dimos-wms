@@ -22,7 +22,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 /** Web-level security rules. The audit service is mocked so these tests never write to the database. */
-@SpringBootTest
+// Its own application context: other tests use csrf(), which swaps the CSRF repository of a shared context for good,
+// and these tests need the real one (they check that the XSRF cookie is handed out).
+@SpringBootTest(properties = "wms.test.context=security-web")
 @AutoConfigureMockMvc
 class SecurityWebTests {
 

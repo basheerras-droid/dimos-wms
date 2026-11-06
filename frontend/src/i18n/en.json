@@ -57,7 +57,9 @@
     "validation": "Check configuration",
     "users": "Users",
     "auditLog": "Audit log",
-    "layout": "Layout preview"
+    "layout": "Layout preview",
+    "roles": "Roles",
+    "permissions": "Permissions"
   },
   "user": {
     "menu": "User menu",
@@ -493,6 +495,39 @@
       "after": "After",
       "address": "Address",
       "correlation": "Correlation id"
+    },
+    "modules": {
+      "dashboard": "Dashboard",
+      "masterdata": "Master data",
+      "administration": "Administration",
+      "general": "General"
+    },
+    "roles": {
+      "title": "Roles",
+      "add": "New role",
+      "new": "New role",
+      "edit": "Edit role",
+      "permission": "Permission",
+      "intro": "A role is a set of permissions. Tick what each role may do. The built-in roles (with a lock) are fixed; create your own roles for anything else.",
+      "superOnly": "Only a super administrator can change roles. You can look at them here.",
+      "builtInHint": "Built-in role: locked",
+      "usedBy": "{{users}} user(s), {{groups}} group(s)",
+      "copy": "Copy as a new role",
+      "copyOf": "Copy of {{name}}",
+      "copyFrom": "Start from the permissions of",
+      "copyFromHelp": "Optional. You can change the ticks afterwards.",
+      "nothing": "(nothing - start empty)",
+      "description": "Description",
+      "codeHint": "Capital letters, digits and _ ; starts with a letter; cannot be changed later.",
+      "discard": "Discard",
+      "saved": "Role {{name}} was saved. People who have this role are signed out and get the new rights at their next sign-in.",
+      "help": "Changes take effect at the next sign-in; people who hold a changed role are signed out when you save."
+    },
+    "permissions": {
+      "title": "Permissions",
+      "intro": "Everything the product can allow, grouped by module. The list is fixed in the software and cannot be edited; roles decide who holds which permission.",
+      "allows": "What it allows",
+      "heldBy": "Held by roles"
     }
   }
 }
