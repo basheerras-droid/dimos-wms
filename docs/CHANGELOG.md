@@ -9,6 +9,16 @@
   `equipment_type`, `equipment`, `equipment_location`, `location_type_hu_type`, `hu_type_nesting`), the 13 seeded
   equipment types (`is_seeded`) and permissions MASTERDATA_VIEW (all roles) / MASTERDATA_EDIT (SUPER_ADMIN, ADMIN).
   Approved design saved in `docs/design/E1-masterdata-tables.md`.
+- `deploy/README.md` 6c: added the pgpass line for `wms_restore_test`.
+- Step E2: new Spring Modulith module `masterdata` with REST CRUD under `/api/masterdata/` for areas, location-types,
+  hu-types, locations, location-links, equipment and equipment-types (paging max 200, sorting on a safe list, search by
+  code/name, filters). Stale update -> HTTP 409 "This record was changed by someone else - reload"; unknown references,
+  duplicate codes, duplicate links, nesting loops and equipment loops are refused with field messages; records still in use
+  cannot be deleted (409 IN_USE). Bulk block/unblock/enable/disable on locations (`POST /locations/bulk`). Assignments:
+  `/location-types/{id}/hu-types`, `/equipment/{id}/locations`, `/hu-types/{id}/placed-in`. Equipment types: only
+  SUPER_ADMIN may add/rename/delete; the 13 built-in types keep their code and cannot be deleted. Every create/update/delete
+  is written to `audit_log` with before/after JSON. Login session now carries permissions (`/api/auth/me` returns
+  `permissions`); endpoints use MASTERDATA_VIEW / MASTERDATA_EDIT.
 
 ## 2026-11-05
 - Brand rules: only the standard DIMOS logo, on a white top bar; negative logo removed.

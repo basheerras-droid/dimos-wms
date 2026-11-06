@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,9 +34,11 @@ class AuthController {
                                  @NotBlank @Size(min = 8, max = 128) String newPassword) {
     }
 
-    record MeResponse(String username, String displayName, List<String> roles, boolean mustChangePassword) {
+    record MeResponse(String username, String displayName, List<String> roles, List<String> permissions,
+                      boolean mustChangePassword) {
         static MeResponse of(WmsUserPrincipal p) {
-            return new MeResponse(p.username(), p.displayName(), p.roles(), p.mustChangePassword());
+            return new MeResponse(p.username(), p.displayName(), p.roles(), p.permissions(),
+                    p.mustChangePassword());
         }
     }
 
@@ -110,7 +113,11 @@ class AuthController {
     }
 
     private void startSession(WmsUserPrincipal principal, HttpServletRequest request, HttpServletResponse response) {
-        var authorities = principal.roles().stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+        // Roles become ROLE_x; every permission becomes an authority of its own (e.g. MASTERDATA_EDIT).
+        var authorities = Stream.concat(
+                        principal.roles().stream().map(r -> "ROLE_" + r),
+                        principal.permissions().stream())
+                .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
         Authentication token = UsernamePasswordAuthenticationToken.authenticated(principal, null, authorities);
         SecurityContext context = holder.createEmptyContext();

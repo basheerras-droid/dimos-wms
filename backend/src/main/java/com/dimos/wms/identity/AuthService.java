@@ -105,7 +105,7 @@ public class AuthService {
 
     WmsUserPrincipal principalOf(AppUser u) {
         return new WmsUserPrincipal(u.getId(), u.getSiteId(), u.getUsername(), u.getDisplayName(),
-                u.getRoleCodes(), u.isMustChangePassword());
+                u.getRoleCodes(), u.getPermissionCodes(), u.isMustChangePassword());
     }
 
     private void audit(AppUser user, String action, String detail, String remoteAddr) {

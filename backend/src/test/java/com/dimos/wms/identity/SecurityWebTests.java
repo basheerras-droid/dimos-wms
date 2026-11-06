@@ -38,7 +38,8 @@ class SecurityWebTests {
     }
 
     private static UsernamePasswordAuthenticationToken session(boolean mustChange) {
-        var p = new WmsUserPrincipal(1L, 1L, "tester", "Test User", List.of("VIEWER"), mustChange);
+        var p = new WmsUserPrincipal(1L, 1L, "tester", "Test User", List.of("VIEWER"), List.of("MASTERDATA_VIEW"),
+                mustChange);
         return UsernamePasswordAuthenticationToken.authenticated(p, null,
                 List.of(new SimpleGrantedAuthority("ROLE_VIEWER")));
     }

@@ -85,6 +85,11 @@ public class AppUser {
         return roles.stream().map(AppRole::getCode).sorted().toList();
     }
 
+    public List<String> getPermissionCodes() {
+        return roles.stream().flatMap(r -> r.getPermissions().stream()).map(AppPermission::getCode).distinct()
+                .sorted().toList();
+    }
+
     public boolean isLocked(Instant now) {
         return lockedUntil != null && lockedUntil.isAfter(now);
     }
