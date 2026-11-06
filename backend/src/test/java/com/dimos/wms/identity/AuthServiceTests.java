@@ -36,7 +36,12 @@ class AuthServiceTests {
 
     @BeforeEach
     void setUp() throws Exception {
-        service = new AuthService(repo, encoder, audit, 5, 15);
+        RightsService rights = mock(RightsService.class);
+        when(rights.of(any())).thenAnswer(inv -> {
+            AppUser u = inv.getArgument(0);
+            return new RightsService.Rights(u.getRoleCodes(), List.of(), u.getRoleCodes(), u.getPermissionCodes(), java.util.Map.of());
+        });
+        service = new AuthService(repo, encoder, audit, rights, 5, 15);
         Constructor<AppUser> c = AppUser.class.getDeclaredConstructor();
         c.setAccessible(true);
         user = c.newInstance();

@@ -8,6 +8,7 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import SettingsIcon from '@mui/icons-material/Settings'
 import type { ReactElement } from 'react'
 import AuditPage from './admin/AuditPage'
+import GroupsPage from './admin/GroupsPage'
 import PermissionsPage from './admin/PermissionsPage'
 import RolesPage from './admin/RolesPage'
 import UsersPage from './admin/UsersPage'
@@ -65,6 +66,7 @@ export const navItems: NavItem[] = [
     // each page needs its own permission; the group shows when at least one of them is allowed
     children: [
       { key: 'users', path: '/administration/users', permission: 'USER_MANAGE', element: <UsersPage key="users" /> },
+      { key: 'groups', path: '/administration/groups', permission: 'USER_MANAGE', element: <GroupsPage key="groups" /> },
       { key: 'roles', path: '/administration/roles', permission: 'ROLE_MANAGE', element: <RolesPage key="roles" /> },
       { key: 'permissions', path: '/administration/permissions', permission: 'ROLE_MANAGE', element: <PermissionsPage key="permissions" /> },
       { key: 'auditLog', path: '/administration/audit', permission: 'AUDIT_VIEW', element: <AuditPage key="audit" /> },

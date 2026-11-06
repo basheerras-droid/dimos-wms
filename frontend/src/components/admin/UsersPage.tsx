@@ -11,6 +11,7 @@ import {
 import {
   DataGrid, type GridColDef, type GridPaginationModel, type GridRenderCellParams, type GridSortModel,
 } from '@mui/x-data-grid'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
@@ -20,6 +21,7 @@ import { useMe } from '../../api/auth'
 import { ApiError } from '../../api/client'
 import { formatDateTime } from '../../format'
 import { errorText } from '../masterdata/errorText'
+import EffectivePermissions from './EffectivePermissions'
 
 type Target = AdminUser | 'new' | null
 
@@ -181,7 +183,14 @@ function UserForm({ user: initial, roles, meUsername, meRoles, onClose, onPasswo
   const creating = user === null
   const iAmSuper = meRoles.includes('SUPER_ADMIN')
   const isSelf = user !== null && user.username === meUsername
-  const targetIsSuper = user?.roles.includes('SUPER_ADMIN') ?? false
+  // the full picture of this user (groups, inherited roles, effective permissions) is read once the drawer is open
+  const detail = useQuery({
+    queryKey: ['admin-user', user?.id, user?.version],
+    queryFn: () => fetchUser(user!.id),
+    enabled: user !== null,
+    gcTime: 0,
+  })
+  const targetIsSuper = (detail.data?.effectiveRoles ?? user?.roles ?? []).includes('SUPER_ADMIN') // directly or through a group
   // Only a super administrator may change a super administrator; nobody changes their own roles or disables themselves.
   const readOnly = targetIsSuper && !iAmSuper
 
@@ -342,6 +351,8 @@ function UserForm({ user: initial, roles, meUsername, meRoles, onClose, onPasswo
               )}
               {isSelf && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>{t('admin.users.ownPassword')}</Typography>}
             </Box>
+            <Divider />
+            {detail.data ? <EffectivePermissions user={detail.data} /> : <Typography variant="body2" color="text.secondary">{t('admin.effective.loading')}</Typography>}
           </>
         )}
         <Typography variant="caption" color="text.secondary">{t('md.requiredHint')}</Typography>

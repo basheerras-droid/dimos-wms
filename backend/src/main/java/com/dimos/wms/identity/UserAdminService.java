@@ -49,9 +49,19 @@ class UserAdminService {
             Long version) {
     }
 
+    /** One permission a user effectively has, and why (through which role, directly or through which group). */
+    record EffectivePermission(String code, String module, String description, List<RightsService.Via> via) {
+    }
+
+    /**
+     * {@code roles} are the direct roles. The last three fields are only filled when one user is read (not in lists):
+     * the groups the user is in, all roles including the groups', and the effective permissions with their sources.
+     */
     record UserView(Long id, String username, String displayName, String email, boolean enabled, List<String> roles,
                     boolean hasPassword, boolean mustChangePassword, boolean locked, Instant lockedUntil,
-                    int failedAttempts, Instant lastLoginAt, long version, Instant updatedAt, String updatedBy) {
+                    int failedAttempts, Instant lastLoginAt, long version, Instant updatedAt, String updatedBy,
+                    List<RightsService.GroupMembership> groups, List<String> effectiveRoles,
+                    List<EffectivePermission> effectivePermissions) {
     }
 
     record UserPage(List<UserView> items, long total, int page, int size) {
@@ -72,17 +82,19 @@ class UserAdminService {
     private final PasswordEncoder encoder;
     private final AuditService audit;
     private final UserSessions sessions;
+    private final RightsService rights;
     private final JsonMapper json;
     private final Clock clock = Clock.systemUTC();
     private final SecureRandom random = new SecureRandom();
 
     UserAdminService(AppUserRepository users, AppRoleRepository roles, PasswordEncoder encoder, AuditService audit,
-                     UserSessions sessions, JsonMapper json) {
+                     UserSessions sessions, RightsService rights, JsonMapper json) {
         this.users = users;
         this.roles = roles;
         this.encoder = encoder;
         this.audit = audit;
         this.sessions = sessions;
+        this.rights = rights;
         this.json = json;
     }
 
@@ -116,7 +128,7 @@ class UserAdminService {
 
     @Transactional(readOnly = true)
     public UserView get(Long id, WmsUserPrincipal who) {
-        return view(load(id, who));
+        return detail(load(id, who));
     }
 
     // ---- changing ---------------------------------------------------------------------------------------
@@ -136,7 +148,7 @@ class UserAdminService {
         AppUser user = users.saveAndFlush(AppUser.create(who.siteId(), username, request.displayName().trim(),
                 blankToNull(request.email()), encoder.encode(temporary), newRoles, who.username()));
         record("USER_CREATED", who, user, null, audited(user));
-        return new CreatedUser(view(user), temporary);
+        return new CreatedUser(detail(user), temporary);
     }
 
     @Transactional
@@ -182,7 +194,7 @@ class UserAdminService {
         if (wasEnabled && !enabled) {
             sessions.invalidateAll(saved.getId()); // signed out at once
         }
-        return view(saved);
+        return detail(saved);
     }
 
     @Transactional
@@ -213,13 +225,14 @@ class UserAdminService {
         audit.record(new AuditEvent(who.username(), "USER_UNLOCKED", who.siteId(), "app_user",
                 String.valueOf(saved.getId()), null, null, "Lock removed for '" + saved.getUsername() + "'",
                 remoteAddr(), null));
-        return view(saved);
+        return detail(saved);
     }
 
     // ---- rules and helpers --------------------------------------------------------------------------------
 
     private void requireSuperAdminToChange(AppUser target, WmsUserPrincipal who) {
-        if (target.hasRole(SUPER_ADMIN) && !who.roles().contains(SUPER_ADMIN)) {
+        // a user is a super administrator directly or through a group
+        if (rights.of(target).roles().contains(SUPER_ADMIN) && !who.roles().contains(SUPER_ADMIN)) {
             throw UserAdminException.notAllowed("Only a super administrator can change a super administrator.");
         }
     }
@@ -259,11 +272,28 @@ class UserAdminService {
         return sb.toString();
     }
 
+    /** For lists: cheap, without groups and effective rights. */
     private UserView view(AppUser u) {
         Instant now = clock.instant();
         return new UserView(u.getId(), u.getUsername(), u.getDisplayName(), u.getEmail(), u.isEnabled(), u.getRoleCodes(),
                 u.getPasswordHash() != null, u.isMustChangePassword(), u.isLocked(now), u.getLockedUntil(),
-                u.getFailedAttempts(), u.getLastLoginAt(), u.getVersion(), u.getUpdatedAt(), u.getUpdatedBy());
+                u.getFailedAttempts(), u.getLastLoginAt(), u.getVersion(), u.getUpdatedAt(), u.getUpdatedBy(),
+                null, null, null);
+    }
+
+    /** For one user: with the groups and the effective permissions. */
+    private UserView detail(AppUser u) {
+        Instant now = clock.instant();
+        RightsService.Rights r = rights.of(u);
+        List<EffectivePermission> effective = r.permissions().stream().map(code -> {
+            PermissionCatalogue.Entry e = PermissionCatalogue.get(code);
+            return new EffectivePermission(code, e == null ? "general" : e.module(), e == null ? "" : e.description(),
+                    r.via().getOrDefault(code, List.of()));
+        }).toList();
+        return new UserView(u.getId(), u.getUsername(), u.getDisplayName(), u.getEmail(), u.isEnabled(), u.getRoleCodes(),
+                u.getPasswordHash() != null, u.isMustChangePassword(), u.isLocked(now), u.getLockedUntil(),
+                u.getFailedAttempts(), u.getLastLoginAt(), u.getVersion(), u.getUpdatedAt(), u.getUpdatedBy(),
+                r.groups(), r.roles(), effective);
     }
 
     private UserAudit audited(AppUser u) {

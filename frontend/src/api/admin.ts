@@ -15,6 +15,19 @@ function query(params: ListParams): string {
 
 // ---- users -----------------------------------------------------------------------------------------------
 
+export interface ViaRole {
+  role: string
+  /** null = the user has the role directly; otherwise the code of the group it comes through. */
+  group: string | null
+}
+
+export interface EffectivePermission {
+  code: string
+  module: string
+  description: string
+  via: ViaRole[]
+}
+
 export interface AdminUser {
   id: number
   username: string
@@ -31,6 +44,10 @@ export interface AdminUser {
   version: number
   updatedAt: string
   updatedBy: string
+  /** Only when one user is read: the groups, all roles (including the groups') and the effective permissions. */
+  groups?: { code: string; enabled: boolean }[] | null
+  effectiveRoles?: string[] | null
+  effectivePermissions?: EffectivePermission[] | null
 }
 
 export interface Permission {
@@ -179,5 +196,76 @@ export function useAuditFilters() {
     queryKey: ['admin-audit-filters'],
     queryFn: () => api<{ actions: string[]; entityTypes: string[] }>(`${ADMIN}/audit/filters`),
     staleTime: 60_000,
+  })
+}
+
+// ---- user groups -----------------------------------------------------------------------------------------
+
+export interface GroupMember {
+  id: number
+  username: string
+  displayName: string
+}
+
+export interface AdminGroup {
+  id: number
+  code: string
+  name: string
+  description: string | null
+  externalRef: string | null
+  enabled: boolean
+  roles: string[]
+  memberCount: number
+  /** Only when one group is read. */
+  members: GroupMember[] | null
+  version: number
+  updatedAt: string
+  updatedBy: string
+}
+
+export interface GroupInput {
+  code: string
+  name: string
+  description: string | null
+  externalRef: string | null
+  enabled: boolean
+  roles: string[]
+  memberIds: number[]
+  version?: number
+}
+
+export function useAdminGroups(params: ListParams) {
+  return useQuery<Page<AdminGroup>>({
+    queryKey: ['admin-groups', params],
+    queryFn: () => api<Page<AdminGroup>>(`${ADMIN}/groups${query(params)}`),
+    placeholderData: keepPreviousData,
+  })
+}
+
+export const fetchGroup = (id: number) => api<AdminGroup>(`${ADMIN}/groups/${id}`)
+
+export function useSaveGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (v: { id?: number; body: GroupInput }) =>
+      v.id === undefined
+        ? api<AdminGroup>(`${ADMIN}/groups`, { method: 'POST', body: v.body })
+        : api<AdminGroup>(`${ADMIN}/groups/${v.id}`, { method: 'PUT', body: v.body }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['admin-groups'] })
+      void qc.invalidateQueries({ queryKey: ['admin-user'] })
+      void qc.invalidateQueries({ queryKey: ['admin-roles'] })
+    },
+  })
+}
+
+export function useDeleteGroup() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => api<void>(`${ADMIN}/groups/${id}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['admin-groups'] })
+      void qc.invalidateQueries({ queryKey: ['admin-roles'] })
+    },
   })
 }

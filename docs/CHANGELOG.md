@@ -50,6 +50,13 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Step E5.7.2 (Flyway V7): **User groups and effective rights**. Administration -> **User groups**: code, name, description, roles,
+  members (searchable picker), enabled, and `external_ref` reserved for an Active Directory / LDAP group name (not used yet).
+  Rights of a user = direct roles + roles of every enabled group the user is in; permissions = union (`RightsService`); this is what
+  the login now puts in the session. The user drawer shows the groups and the **effective permissions** by module with the reason
+  (role, or role through group). Rules: only a SUPER_ADMIN may give a group the SUPER_ADMIN role or change such a group; a user who
+  is super administrator through a group is protected like one with the direct role; saving or deleting a group signs its members
+  out; roles show how many groups use them and cannot be deleted while a group does. Audit: GROUP_CREATED / UPDATED / DELETED.
 - Step E5.7.1 (Flyway V6): **Permissions and Roles**. Permission catalogue fixed in code (`PermissionCatalogue`: code, module,
   description), checked against the database at start-up and by a test; new permissions ROLE_MANAGE, WORKSTATION_MANAGE,
   PARAMETER_VIEW, PARAMETER_EDIT (default grants as agreed). Administration -> **Permissions**: read-only, grouped by module, shows

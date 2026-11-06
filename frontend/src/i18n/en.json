@@ -59,7 +59,8 @@
     "auditLog": "Audit log",
     "layout": "Layout preview",
     "roles": "Roles",
-    "permissions": "Permissions"
+    "permissions": "Permissions",
+    "groups": "User groups"
   },
   "user": {
     "menu": "User menu",
@@ -528,6 +529,38 @@
       "intro": "Everything the product can allow, grouped by module. The list is fixed in the software and cannot be edited; roles decide who holds which permission.",
       "allows": "What it allows",
       "heldBy": "Held by roles"
+    },
+    "groups": {
+      "title": "User groups",
+      "add": "New group",
+      "new": "New group",
+      "edit": "Edit group",
+      "view": "Group",
+      "intro": "A group has roles and members. Every member gets the roles of the group in addition to the roles he or she has directly, so a user can be in several groups.",
+      "members": "Members",
+      "addMembers": "Add members (type to search)",
+      "membersHelp": "People are signed out when their group changes, to get the new rights.",
+      "codeHint": "2-50 characters: letters, digits, . _ -",
+      "codeFixed": "The code cannot be changed.",
+      "externalRef": "External group name",
+      "externalRefHelp": "Optional and not used yet: the name of the matching group in Active Directory / LDAP, for the sign-in integration planned later.",
+      "enabledLabel": "Group enabled",
+      "enabledHelp": "A disabled group gives its members nothing.",
+      "rolesHelp": "The members inherit all permissions of these roles.",
+      "superOnly": "This group carries the SUPER_ADMIN role: only a super administrator can change it.",
+      "saved": "The group was saved.",
+      "none": "No groups yet.",
+      "deleteText": "Group {{name}} will be deleted. Its members keep their own roles but lose the roles they had through this group."
+    },
+    "effective": {
+      "groups": "Groups",
+      "noGroups": "Not in any group.",
+      "groupsHelp": "Group membership is managed under Administration -> User groups.",
+      "title": "Effective permissions ({{count}})",
+      "help": "Everything this user may do: the permissions of the direct roles and of the roles of all enabled groups. A workstation can restrict this further.",
+      "viaRole": "role {{role}}",
+      "viaGroup": "role {{role}} through group {{group}}",
+      "loading": "Loading the effective permissions..."
     }
   }
 }

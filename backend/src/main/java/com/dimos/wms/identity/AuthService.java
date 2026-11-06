@@ -28,16 +28,18 @@ public class AuthService {
     private final AppUserRepository users;
     private final PasswordEncoder encoder;
     private final AuditService audit;
+    private final RightsService rights;
     private final int maxAttempts;
     private final Duration lockDuration;
     private final Clock clock = Clock.systemUTC();
 
-    AuthService(AppUserRepository users, PasswordEncoder encoder, AuditService audit,
+    AuthService(AppUserRepository users, PasswordEncoder encoder, AuditService audit, RightsService rights,
                 @Value("${wms.security.max-failed-attempts:5}") int maxAttempts,
                 @Value("${wms.security.lockout-minutes:15}") long lockoutMinutes) {
         this.users = users;
         this.encoder = encoder;
         this.audit = audit;
+        this.rights = rights;
         this.maxAttempts = maxAttempts;
         this.lockDuration = Duration.ofMinutes(lockoutMinutes);
         this.dummyHash = encoder.encode("not-a-real-password");
@@ -104,8 +106,9 @@ public class AuthService {
     }
 
     WmsUserPrincipal principalOf(AppUser u) {
+        RightsService.Rights r = rights.of(u); // direct roles + roles of the user's enabled groups
         return new WmsUserPrincipal(u.getId(), u.getSiteId(), u.getUsername(), u.getDisplayName(),
-                u.getRoleCodes(), u.getPermissionCodes(), u.isMustChangePassword());
+                r.roles(), r.permissions(), u.isMustChangePassword());
     }
 
     private void audit(AppUser user, String action, String detail, String remoteAddr) {

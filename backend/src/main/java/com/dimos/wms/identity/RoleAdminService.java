@@ -75,7 +75,7 @@ class RoleAdminService {
     @Transactional(readOnly = true)
     public List<RoleView> list() {
         Map<Long, Integer> users = counts("select role_id, count(*) from user_role group by role_id");
-        Map<Long, Integer> groups = Map.of(); // user groups arrive in part 2
+        Map<Long, Integer> groups = counts("select role_id, count(*) from user_group_role group by role_id");
         return roles.findAll(Sort.by("id")).stream().map(r -> view(r, users, groups)).toList();
     }
 
@@ -116,7 +116,7 @@ class RoleAdminService {
         record("ROLE_UPDATED", who, saved, before, audited(saved));
         signOutHolders(saved.getId(), who);
         return view(saved, counts("select role_id, count(*) from user_role where role_id = " + id + " group by role_id"),
-                Map.of());
+                counts("select role_id, count(*) from user_group_role where role_id = " + id + " group by role_id"));
     }
 
     @Transactional
@@ -125,7 +125,7 @@ class RoleAdminService {
         AppRole role = load(id);
         requireCustom(role, "deleted");
         Integer users = jdbc.queryForObject("select count(*) from user_role where role_id = ?", Integer.class, id);
-        Integer groups = 0; // user groups arrive in part 2
+        Integer groups = jdbc.queryForObject("select count(*) from user_group_role where role_id = ?", Integer.class, id);
         List<String> used = new java.util.ArrayList<>();
         if (users != null && users > 0) {
             used.add(users + (users == 1 ? " user" : " users"));
@@ -199,7 +199,9 @@ class RoleAdminService {
 
     private void signOutHolders(Long roleId, WmsUserPrincipal who) {
         List<Long> holders = jdbc.queryForList(
-                "select distinct user_id from user_role where role_id = ?", Long.class, roleId);
+                "select user_id from user_role where role_id = ? "
+                        + "union select m.user_id from user_group_member m join user_group_role gr on gr.user_group_id = m.user_group_id where gr.role_id = ?",
+                Long.class, roleId, roleId);
         holders.stream().filter(u -> !u.equals(who.userId())).forEach(sessions::invalidateAll);
     }
 
