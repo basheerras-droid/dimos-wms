@@ -50,7 +50,4 @@ server:
 logging:
   pattern:
     level: "%5p [%X{correlationId:-}]"
-wms:
-  security:
-    max-failed-attempts: 5
-    lockout-minutes: 15
+# Lockout, password length and session timeout are system parameters now (Administration -> Parameters).

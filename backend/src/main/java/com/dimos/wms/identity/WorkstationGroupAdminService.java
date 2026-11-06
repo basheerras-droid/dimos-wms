@@ -60,15 +60,17 @@ class WorkstationGroupAdminService {
     private final JdbcTemplate jdbc;
     private final AuditService audit;
     private final WorkstationResolver resolver;
+    private final ParameterService parameters;
     private final JsonMapper json;
 
     WorkstationGroupAdminService(WorkstationGroupRepository groups, AppPermissionRepository permissions, JdbcTemplate jdbc,
-                                 AuditService audit, WorkstationResolver resolver, JsonMapper json) {
+                                 AuditService audit, WorkstationResolver resolver, ParameterService parameters, JsonMapper json) {
         this.groups = groups;
         this.permissions = permissions;
         this.jdbc = jdbc;
         this.audit = audit;
         this.resolver = resolver;
+        this.parameters = parameters;
         this.json = json;
     }
 
@@ -160,6 +162,7 @@ class WorkstationGroupAdminService {
         groups.delete(group);
         groups.flush();
         record("WORKSTATION_GROUP_DELETED", who, group, before, null);
+        parameters.deleteValuesOf(ParameterService.Scope.WS_GROUP, id);
         resolver.clearCache();
     }
 

@@ -31,7 +31,7 @@ class AuthController {
     }
 
     record ChangePasswordRequest(@NotBlank @Size(max = 200) String currentPassword,
-                                 @NotBlank @Size(min = 8, max = 128) String newPassword) {
+                                 @NotBlank @Size(max = 128) String newPassword) {
     }
 
     /** Where the browser is registered as a workstation (or office mode) and whether that restricts the user. */
@@ -44,12 +44,12 @@ class AuthController {
     }
 
     record MeResponse(String username, String displayName, List<String> roles, List<String> permissions,
-                      boolean mustChangePassword, WorkstationInfo workstation) {
+                      boolean mustChangePassword, WorkstationInfo workstation, int passwordMinLength) {
         /** The permissions shown are the ones that apply at this workstation. */
-        static MeResponse of(WmsUserPrincipal p, WorkstationContext ctx) {
+        static MeResponse of(WmsUserPrincipal p, WorkstationContext ctx, int passwordMinLength) {
             WmsUserPrincipal effective = ctx.restricts() ? WorkstationFilter.restrict(p, ctx) : p;
             return new MeResponse(effective.username(), effective.displayName(), effective.roles(), effective.permissions(),
-                    effective.mustChangePassword(), WorkstationInfo.of(ctx));
+                    effective.mustChangePassword(), WorkstationInfo.of(ctx), passwordMinLength);
         }
     }
 
@@ -62,9 +62,11 @@ class AuthController {
 
     private final UserSessions sessions;
     private final WorkstationResolver workstationResolver;
+    private final ParameterService params;
 
     AuthController(AuthService auth, SecurityContextRepository contextRepository, UserSessions sessions,
-                   WorkstationResolver workstationResolver) {
+                   WorkstationResolver workstationResolver, ParameterService params) {
+        this.params = params;
         this.sessions = sessions;
         this.workstationResolver = workstationResolver;
         this.auth = auth;
@@ -89,7 +91,8 @@ class AuthController {
             request.changeSessionId(); // protects against session fixation
         }
         startSession(result.principal(), request, response);
-        return ResponseEntity.ok(MeResponse.of(result.principal(), workstationResolver.resolve(request, result.principal().siteId())));
+        return ResponseEntity.ok(MeResponse.of(result.principal(), workstationResolver.resolve(request, result.principal().siteId()),
+                auth.passwordMinLength(result.principal().siteId())));
     }
 
     @GetMapping("/me")
@@ -97,7 +100,7 @@ class AuthController {
         WmsUserPrincipal principal = (WmsUserPrincipal) authentication.getPrincipal(); // already restricted by WorkstationFilter
         Object ctx = request.getAttribute(WorkstationFilter.ATTRIBUTE);
         WorkstationContext workstation = ctx instanceof WorkstationContext c ? c : WorkstationContext.OFFICE;
-        return MeResponse.of(principal, workstation); // restricting twice gives the same result
+        return MeResponse.of(principal, workstation, auth.passwordMinLength(principal.siteId())); // restricting twice gives the same result
     }
 
     @PostMapping("/logout")
@@ -121,6 +124,9 @@ class AuthController {
             case WRONG_CURRENT_PASSWORD:
                 return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
                         .body(new Problem("WRONG_CURRENT_PASSWORD", "The current password is not correct."));
+            case TOO_SHORT:
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(new Problem("PASSWORD_TOO_SHORT",
+                        "The new password must have at least " + auth.passwordMinLength(principal.siteId()) + " characters."));
             case SAME_PASSWORD:
                 return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT)
                         .body(new Problem("SAME_PASSWORD", "The new password must be different from the current one."));
@@ -129,7 +135,8 @@ class AuthController {
         }
         WmsUserPrincipal updated = principal.withMustChangePassword(false);
         startSession(updated, request, response);
-        return ResponseEntity.ok(MeResponse.of(updated, workstationResolver.resolve(request, updated.siteId())));
+        return ResponseEntity.ok(MeResponse.of(updated, workstationResolver.resolve(request, updated.siteId()),
+                auth.passwordMinLength(updated.siteId())));
     }
 
     private void startSession(WmsUserPrincipal principal, HttpServletRequest request, HttpServletResponse response) {
@@ -145,5 +152,11 @@ class AuthController {
         holder.setContext(context);
         contextRepository.saveContext(context, request, response);
         sessions.register(principal.userId(), request.getSession());
+        // how long this browser may stay idle: a system parameter, possibly different for a workstation (e.g. kiosks)
+        WorkstationContext ws = workstationResolver.resolve(request, principal.siteId());
+        boolean atWorkstation = ws.mode() == WorkstationContext.Mode.REGISTERED || ws.mode() == WorkstationContext.Mode.DISABLED;
+        java.time.Duration timeout = params.durationValue("security.session_timeout", principal.siteId(),
+                atWorkstation ? ws.groupId() : null, atWorkstation ? ws.id() : null);
+        request.getSession().setMaxInactiveInterval((int) Math.min(timeout.toSeconds(), Integer.MAX_VALUE));
     }
 }

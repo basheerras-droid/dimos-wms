@@ -87,7 +87,12 @@ Menu changes (all text through i18n, brand rules from CLAUDE.md):
 - Import screen: choose entity -> download template -> upload -> dry-run result table -> Apply.
 
 ## E5.7 - Administration extended (owner's request, 2026-11-07)
-Status: tables proposed in `docs/design/E5.7-administration-tables.md`; no code before the owner says OK.
+Status: DONE 2026-11-07 in four parts (Flyway V6-V9); design in `docs/design/E5.7-administration-tables.md` (approved).
+Owner's extra rules: (A) a workstation-group restriction never removes WORKSTATION_MANAGE from SUPER_ADMIN, and a SUPER_ADMIN
+can always "unregister this browser" from the device (back to office mode); (B) security bounds enforced on the server and
+fixed in the parameter definitions: password minimum length >= 8, lockout attempts 3-10, lockout minutes 5-1440, session timeout
+5 minutes - 12 hours. The workstation cookie is long-lived (10 years); a browser that lost it shows "not registered" and an
+administrator can register it again.
 Common rules: every new business table has `site_id`, `version`, audit columns; portable SQL in `common/`; every change
 is written to the audit log.
 1. **Permissions**: catalogue fixed in code (code + module + description), read-only screen grouped by module.

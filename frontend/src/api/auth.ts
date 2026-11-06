@@ -23,6 +23,8 @@ export interface Me {
   permissions: string[]
   mustChangePassword: boolean
   workstation: WorkstationInfo
+  /** The shortest password allowed (a system parameter, at least 8). */
+  passwordMinLength: number
 }
 
 const ME_KEY = ['me'] as const

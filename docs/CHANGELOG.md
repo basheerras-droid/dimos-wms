@@ -50,6 +50,17 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Step E5.7.4 (Flyway V9): **System parameters**. Administration -> **Parameters**: every setting with the value that applies and
+  where it comes from (Default / Everywhere / This site / Group X / Workstation X), "show the values at workstation Y", edit per scope
+  with the right editor for the type (number, yes/no, text, choice, duration), Save / Remove per value, who changed it last.
+  `parameter_definition` is seeded by Flyway (type INT / BOOL / TEXT / CHOICE / DURATION, default, min, max, allowed scopes, restart
+  needed); `parameter_value` per scope GLOBAL / SITE / WS_GROUP / WORKSTATION, most specific wins, cached for 30 s and cleared on
+  every change; values are validated on the server against type and bounds; every change is audited (PARAMETER_VALUE_SET / REMOVED
+  with before and after). Seeded: session timeout (PT30M, PT5M..PT12H, all scopes), password minimum length (8, 8..128), lockout
+  attempts (5, 3..10), lockout minutes (15, 5..1440), audit retention days (365, 30..3650, recorded only). **The existing settings now
+  read these parameters**: lockout attempts and minutes (AuthService), the minimum password length (change-password, also shown on the
+  page), the session timeout (applied at sign-in, possibly shorter for a workstation or group). The old `wms.security.*` entries in
+  application.yml are gone. Deleting a workstation or group removes its parameter values. Tests guard the exact bounds.
 - Step E5.7.3 (Flyway V8): **Workstations and workstation groups**. Administration -> **Workstations** (code, name, type PC / HANDHELD /
   HMI / KIOSK, location, workstation group, host name, IP address with optional IP check, default printer as text, enabled) and
   **Workstation groups** (optional list of allowed permissions; empty list or disabled group = no restriction). Browser registration:

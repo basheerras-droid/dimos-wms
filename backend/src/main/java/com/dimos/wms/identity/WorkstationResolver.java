@@ -78,7 +78,7 @@ class WorkstationResolver {
                 && !String.valueOf(cached.ipAddress()).equals(request.getRemoteAddr())) {
             // the cookie is on another machine than the one registered: no workstation rights, and say why
             return new WorkstationContext(WorkstationContext.Mode.IP_MISMATCH, false, ctx.id(), ctx.code(), ctx.name(),
-                    ctx.type(), ctx.groupCode(), ctx.locationCode(), null);
+                    ctx.type(), ctx.groupCode(), ctx.locationCode(), null, ctx.groupId());
         }
         return ctx;
     }
@@ -109,7 +109,8 @@ class WorkstationResolver {
             restriction = allowed.isEmpty() ? null : allowed; // an empty list means "no restriction"
         }
         WorkstationContext ctx = new WorkstationContext(enabled ? WorkstationContext.Mode.REGISTERED : WorkstationContext.Mode.DISABLED,
-                false, (Long) r[0], (String) r[1], (String) r[2], (String) r[3], (String) r[8], (String) r[10], restriction);
+                false, (Long) r[0], (String) r[1], (String) r[2], (String) r[3], (String) r[8], (String) r[10], restriction,
+                r[7] == null ? null : ((Number) r[7]).longValue());
         return new Cached(ctx, (Boolean) r[5], (String) r[6], expires);
     }
 }

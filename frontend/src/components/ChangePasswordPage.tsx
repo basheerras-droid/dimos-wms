@@ -20,19 +20,20 @@ export default function ChangePasswordPage() {
   if (me.isLoading) return null
   if (!me.data) return <Navigate to="/login" replace />
   const forced = me.data.mustChangePassword
+  const min = me.data.passwordMinLength ?? 8
 
   function message(e: unknown): string {
     if (e instanceof ApiError) {
       if (e.code === 'WRONG_CURRENT_PASSWORD') return t('changePassword.wrongCurrent')
       if (e.code === 'SAME_PASSWORD') return t('changePassword.same')
-      if (e.code === 'VALIDATION_ERROR') return t('changePassword.tooShort')
+      if (e.code === 'VALIDATION_ERROR' || e.code === 'PASSWORD_TOO_SHORT') return t('changePassword.tooShort', { min })
     }
     return t('changePassword.failed')
   }
 
   function submit(ev: FormEvent) {
     ev.preventDefault()
-    if (next.length < 8) return setError(t('changePassword.tooShort'))
+    if (next.length < min) return setError(t('changePassword.tooShort', { min }))
     if (next !== repeat) return setError(t('changePassword.mismatch'))
     setError(null)
     change.mutate(
@@ -61,7 +62,7 @@ export default function ChangePasswordPage() {
               </Alert>
             )}
             <TextField label={t('changePassword.current')} type="password" value={current} onChange={(e) => setCurrent(e.target.value)} autoComplete="current-password" autoFocus fullWidth margin="normal" />
-            <TextField label={t('changePassword.new')} type="password" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" helperText={t('changePassword.hint')} fullWidth margin="normal" />
+            <TextField label={t('changePassword.new')} type="password" value={next} onChange={(e) => setNext(e.target.value)} autoComplete="new-password" helperText={t('changePassword.hint', { min })} fullWidth margin="normal" />
             <TextField label={t('changePassword.confirm')} type="password" value={repeat} onChange={(e) => setRepeat(e.target.value)} autoComplete="new-password" fullWidth margin="normal" />
             <Button type="submit" variant="contained" size="large" fullWidth disabled={change.isPending} sx={{ mt: 2 }}>
               {change.isPending ? t('changePassword.submitting') : t('changePassword.submit')}

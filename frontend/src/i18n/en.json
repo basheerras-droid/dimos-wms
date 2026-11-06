@@ -25,10 +25,10 @@
     "current": "Current password",
     "new": "New password",
     "confirm": "Repeat new password",
-    "hint": "At least 8 characters, different from the current password.",
+    "hint": "At least {{min}} characters, different from the current password.",
     "submit": "Change password",
     "submitting": "Saving...",
-    "tooShort": "The new password must have at least 8 characters.",
+    "tooShort": "The new password must have at least {{min}} characters.",
     "mismatch": "The two new passwords are not the same.",
     "wrongCurrent": "The current password is not correct.",
     "same": "The new password must be different from the current one.",
@@ -62,7 +62,8 @@
     "permissions": "Permissions",
     "groups": "User groups",
     "workstations": "Workstations",
-    "workstationGroups": "Workstation groups"
+    "workstationGroups": "Workstation groups",
+    "parameters": "Parameters"
   },
   "user": {
     "menu": "User menu",
@@ -627,6 +628,52 @@
       "saveFirst": "Save the workstation first; then you can register a browser.",
       "saved": "The workstation was saved.",
       "none": "No workstations yet."
+    },
+    "parameters": {
+      "title": "System parameters",
+      "intro": "Settings of the system. Each has a default, and you can set another value for everywhere, for this site, for a workstation group or for a single workstation - the most specific value wins. The limits of each setting are fixed in the software for security and cannot be widened here.",
+      "modules": {
+        "security": "Security",
+        "audit": "Audit log"
+      },
+      "parameter": "Parameter",
+      "value": "Value that applies",
+      "source": "Comes from",
+      "default": "Default",
+      "range": "Allowed range",
+      "viewAs": "Show the values that apply at",
+      "viewAsHelp": "A workstation, or the site in general.",
+      "thisSite": "This site (in general)",
+      "src": {
+        "DEFAULT": "Default",
+        "GLOBAL": "Everywhere",
+        "SITE": "This site",
+        "WS_GROUP": "Group {{code}}",
+        "WORKSTATION": "Workstation {{code}}"
+      },
+      "scope": {
+        "GLOBAL": "Everywhere (all sites)",
+        "SITE": "This site",
+        "WS_GROUP_PLURAL": "Workstation groups",
+        "WORKSTATION_PLURAL": "Single workstations"
+      },
+      "hours": "{{count}} hour(s)",
+      "minutes": "{{count}} minute(s)",
+      "unitMinutes": "minutes",
+      "unitHours": "hours",
+      "defaultIs": "Default: {{value}}",
+      "allowedRange": "Allowed: {{range}}",
+      "restartNeeded": "Needs a server restart",
+      "boundsFixed": "The allowed range is fixed in the software. A value outside it is refused by the server.",
+      "viewOnly": "You can look at the parameters but not change them.",
+      "valuesTitle": "Values",
+      "valuesHelp": "From least to most specific. A value that is not set uses the next less specific one, and in the end the default.",
+      "notSet": "Not set - the next less specific value applies.",
+      "noOverrides": "No exceptions set.",
+      "addForGroup": "Add a value for a workstation group",
+      "addForWorkstation": "Add a value for a workstation",
+      "remove": "Remove",
+      "changedBy": "Last changed by {{by}}"
     }
   },
   "workstation": {

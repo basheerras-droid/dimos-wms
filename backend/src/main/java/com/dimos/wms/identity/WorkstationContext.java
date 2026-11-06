@@ -15,14 +15,14 @@ import java.util.Set;
  * {@code restriction} is the set of allowed permissions, or null when nothing is restricted.
  */
 record WorkstationContext(Mode mode, boolean staleCookie, Long id, String code, String name, String type,
-                          String groupCode, String locationCode, Set<String> restriction) {
+                          String groupCode, String locationCode, Set<String> restriction, Long groupId) {
 
     enum Mode { OFFICE, REGISTERED, DISABLED, IP_MISMATCH }
 
-    static final WorkstationContext OFFICE = new WorkstationContext(Mode.OFFICE, false, null, null, null, null, null, null, null);
+    static final WorkstationContext OFFICE = new WorkstationContext(Mode.OFFICE, false, null, null, null, null, null, null, null, null);
 
     static WorkstationContext officeWithStaleCookie() {
-        return new WorkstationContext(Mode.OFFICE, true, null, null, null, null, null, null, null);
+        return new WorkstationContext(Mode.OFFICE, true, null, null, null, null, null, null, null, null);
     }
 
     /** True when the rights of the user are cut down at this workstation. */

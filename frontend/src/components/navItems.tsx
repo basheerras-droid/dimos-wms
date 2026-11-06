@@ -9,6 +9,7 @@ import SettingsIcon from '@mui/icons-material/Settings'
 import type { ReactElement } from 'react'
 import AuditPage from './admin/AuditPage'
 import GroupsPage from './admin/GroupsPage'
+import ParametersPage from './admin/ParametersPage'
 import PermissionsPage from './admin/PermissionsPage'
 import RolesPage from './admin/RolesPage'
 import UsersPage from './admin/UsersPage'
@@ -73,6 +74,7 @@ export const navItems: NavItem[] = [
       { key: 'permissions', path: '/administration/permissions', permission: 'ROLE_MANAGE', element: <PermissionsPage key="permissions" /> },
       { key: 'workstations', path: '/administration/workstations', permission: 'WORKSTATION_MANAGE', element: <WorkstationsPage key="workstations" /> },
       { key: 'workstationGroups', path: '/administration/workstation-groups', permission: 'WORKSTATION_MANAGE', element: <WorkstationGroupsPage key="workstation-groups" /> },
+      { key: 'parameters', path: '/administration/parameters', permission: 'PARAMETER_VIEW', element: <ParametersPage key="parameters" /> },
       { key: 'auditLog', path: '/administration/audit', permission: 'AUDIT_VIEW', element: <AuditPage key="audit" /> },
     ],
   },

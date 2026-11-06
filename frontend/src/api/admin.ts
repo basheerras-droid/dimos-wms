@@ -418,3 +418,71 @@ export function useRegistration() {
     }),
   }
 }
+
+// ---- system parameters -----------------------------------------------------------------------------------
+
+export type ParameterScope = 'GLOBAL' | 'SITE' | 'WS_GROUP' | 'WORKSTATION'
+
+export interface ParameterOverride {
+  id: number
+  scope: ParameterScope
+  scopeRefId: number
+  /** Code of the workstation group / workstation; empty for GLOBAL and SITE. */
+  scopeRefCode: string | null
+  value: string
+  version: number
+  updatedAt: string
+  updatedBy: string
+}
+
+export interface ParameterView {
+  code: string
+  module: string
+  name: string
+  description: string | null
+  type: 'INT' | 'BOOL' | 'TEXT' | 'CHOICE' | 'DURATION'
+  unit: string | null
+  defaultValue: string
+  min: string | null
+  max: string | null
+  choices: string[]
+  allowedScopes: ParameterScope[]
+  restartNeeded: boolean
+  /** The value that applies, and where it comes from (DEFAULT, GLOBAL, SITE, WS_GROUP or WORKSTATION). */
+  effective: { value: string; source: 'DEFAULT' | ParameterScope; sourceRefId: number | null; sourceRefCode: string | null }
+  overrides: ParameterOverride[]
+}
+
+/** All parameters; with a workstation id, as they apply at that workstation. */
+export function useParameters(workstationId: string) {
+  return useQuery<ParameterView[]>({
+    queryKey: ['admin-parameters', workstationId],
+    queryFn: () => api<ParameterView[]>(`${ADMIN}/parameters${workstationId ? `?workstationId=${workstationId}` : ''}`),
+  })
+}
+
+export function useSetParameter() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (v: { code: string; scope: ParameterScope; scopeRefId: number | null; value: string; version?: number }) =>
+      api<ParameterView>(`${ADMIN}/parameters/${v.code}/values`, {
+        method: 'PUT', body: { scope: v.scope, scopeRefId: v.scopeRefId, value: v.value, version: v.version },
+      }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['admin-parameters'] })
+      void qc.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+export function useRemoveParameter() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (v: { code: string; scope: ParameterScope; scopeRefId: number | null }) =>
+      api<ParameterView>(`${ADMIN}/parameters/${v.code}/values?scope=${v.scope}${v.scopeRefId === null ? '' : `&scopeRefId=${v.scopeRefId}`}`, { method: 'DELETE' }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['admin-parameters'] })
+      void qc.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}

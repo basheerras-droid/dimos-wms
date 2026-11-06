@@ -6,7 +6,6 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,7 @@ public class AuthService {
     public record LoginResult(Status status, WmsUserPrincipal principal, Instant lockedUntil) {
     }
 
-    public enum ChangeStatus { OK, WRONG_CURRENT_PASSWORD, SAME_PASSWORD }
+    public enum ChangeStatus { OK, WRONG_CURRENT_PASSWORD, SAME_PASSWORD, TOO_SHORT }
 
     /** Hash of a throw-away value, compared against when the user does not exist so timing does not reveal it. */
     private final String dummyHash;
@@ -29,19 +28,16 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final AuditService audit;
     private final RightsService rights;
-    private final int maxAttempts;
-    private final Duration lockDuration;
+    private final ParameterService params;
     private final Clock clock = Clock.systemUTC();
 
     AuthService(AppUserRepository users, PasswordEncoder encoder, AuditService audit, RightsService rights,
-                @Value("${wms.security.max-failed-attempts:5}") int maxAttempts,
-                @Value("${wms.security.lockout-minutes:15}") long lockoutMinutes) {
+                ParameterService params) {
         this.users = users;
         this.encoder = encoder;
         this.audit = audit;
         this.rights = rights;
-        this.maxAttempts = maxAttempts;
-        this.lockDuration = Duration.ofMinutes(lockoutMinutes);
+        this.params = params;
         this.dummyHash = encoder.encode("not-a-real-password");
     }
 
@@ -68,6 +64,9 @@ public class AuthService {
         }
         boolean passwordOk = encoder.matches(password, user.getPasswordHash());
         if (!passwordOk || !user.isEnabled()) {
+            // the lockout rules are system parameters (bounds enforced there), read for the user's site
+            int maxAttempts = params.intValue("security.lockout_attempts", user.getSiteId());
+            Duration lockDuration = Duration.ofMinutes(params.intValue("security.lockout_minutes", user.getSiteId()));
             boolean locked = user.registerFailedLogin(maxAttempts, lockDuration, now);
             users.save(user);
             audit(user, "LOGIN_FAILURE", !user.isEnabled() ? "Account disabled"
@@ -96,6 +95,9 @@ public class AuthService {
             audit(user, "PASSWORD_CHANGE_FAILURE", "Current password was wrong", remoteAddr);
             return ChangeStatus.WRONG_CURRENT_PASSWORD;
         }
+        if (next.length() < passwordMinLength(user.getSiteId())) {
+            return ChangeStatus.TOO_SHORT;
+        }
         if (encoder.matches(next, user.getPasswordHash())) {
             return ChangeStatus.SAME_PASSWORD;
         }
@@ -103,6 +105,11 @@ public class AuthService {
         users.save(user);
         audit(user, "PASSWORD_CHANGED", null, remoteAddr);
         return ChangeStatus.OK;
+    }
+
+    /** The shortest password allowed at the site (system parameter, never below 8). */
+    int passwordMinLength(Long siteId) {
+        return params.intValue("security.password_min_length", siteId);
     }
 
     WmsUserPrincipal principalOf(AppUser u) {

@@ -41,7 +41,11 @@ class AuthServiceTests {
             AppUser u = inv.getArgument(0);
             return new RightsService.Rights(u.getRoleCodes(), List.of(), u.getRoleCodes(), u.getPermissionCodes(), java.util.Map.of());
         });
-        service = new AuthService(repo, encoder, audit, rights, 5, 15);
+        ParameterService params = mock(ParameterService.class);
+        when(params.intValue(org.mockito.ArgumentMatchers.eq("security.lockout_attempts"), any())).thenReturn(5);
+        when(params.intValue(org.mockito.ArgumentMatchers.eq("security.lockout_minutes"), any())).thenReturn(15);
+        when(params.intValue(org.mockito.ArgumentMatchers.eq("security.password_min_length"), any())).thenReturn(8);
+        service = new AuthService(repo, encoder, audit, rights, params);
         Constructor<AppUser> c = AppUser.class.getDeclaredConstructor();
         c.setAccessible(true);
         user = c.newInstance();

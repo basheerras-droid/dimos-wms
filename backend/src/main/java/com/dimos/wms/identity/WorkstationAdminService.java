@@ -70,15 +70,17 @@ class WorkstationAdminService {
     private final JdbcTemplate jdbc;
     private final AuditService audit;
     private final WorkstationResolver resolver;
+    private final ParameterService parameters;
     private final JsonMapper json;
     private final SecureRandom random = new SecureRandom();
 
     WorkstationAdminService(WorkstationRepository workstations, JdbcTemplate jdbc, AuditService audit,
-                            WorkstationResolver resolver, JsonMapper json) {
+                            WorkstationResolver resolver, ParameterService parameters, JsonMapper json) {
         this.workstations = workstations;
         this.jdbc = jdbc;
         this.audit = audit;
         this.resolver = resolver;
+        this.parameters = parameters;
         this.json = json;
     }
 
@@ -156,6 +158,7 @@ class WorkstationAdminService {
         workstations.delete(w);
         workstations.flush();
         record("WORKSTATION_DELETED", who, w, before, null);
+        parameters.deleteValuesOf(ParameterService.Scope.WORKSTATION, id); // its parameter values go with it
         resolver.clearCache();
     }
 
