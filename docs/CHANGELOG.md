@@ -50,6 +50,16 @@
   "DIMOS WMS 0.1.0 - build 2026-11-06 19:05 - commit 36232c2" (plus "(with uncommitted changes)" for a dirty working tree).
 - UI: side navigation panel 240 px wide, labels on one line (ellipsis + title if too long), sub-items 13 px; the hamburger still
   collapses it to icons.
+- Step E5.6: **Master data -> Layout preview** (MASTERDATA_VIEW), read-only. Backend `/api/masterdata/layout/plan|racks|rack-face`
+  (plain SQL, compact JSON). **Plan view**: one level at a time, locations by x / y coloured per area (legend chips hide / show an
+  area), links as lines (dashed = disabled; arrows and location codes appear when zoomed in), disabled = hollow dashed, blocked =
+  ring + cross, zoom with wheel or buttons, drag to pan, "show everything", click a location for details and "Open record" (opens
+  its drawer); warnings for locations without x / y and for links to other levels. **Rack face** (for INL: about 74 columns x 12
+  levels per aisle side): choose aisle + side, grid of column_no (across) by level_no (up), one cell per location coloured by state
+  with patterns (disabled hatched, blocked outbound striped, blocked both cross-hatched) so colour is not the only cue, a fill-level
+  figure (usable = enabled and not blocked, rounded down; real occupancy is shown once inventory exists), warnings for two locations
+  in one cell and locations without a column, click a cell to see / open the location. Colours are theme tokens (`palette.layout`).
+  Tested with a 74 x 12 x 2-sided rack (889 cells in well under a second).
 - Import: a CSV that mixes separators (e.g. TAB in the header, commas in the rows) now gives ONE file-level message ("The header
   row uses TAB but row 2 uses comma - use one separator in the whole file.") instead of one confusing error per row. Every problem
   with the file as a whole (wrong type, empty, too many rows, unreadable, mixed separators) is now shown that way in the check

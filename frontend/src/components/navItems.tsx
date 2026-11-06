@@ -11,6 +11,7 @@ import AuditPage from './admin/AuditPage'
 import UsersPage from './admin/UsersPage'
 import EntityPage from './masterdata/EntityPage'
 import EquipmentTypesPage from './masterdata/EquipmentTypesPage'
+import LayoutPage from './layout/LayoutPage'
 import ImportPage from './masterdata/ImportPage'
 import ValidationPage from './masterdata/ValidationPage'
 import {
@@ -49,6 +50,7 @@ export const navItems: NavItem[] = [
       // static configuration of the equipment; the top-level "Equipment (WCS)" entry is for live status (later step)
       { key: 'equipmentMaster', path: '/masterdata/equipment', element: <EntityPage key="equipmentConfig" config={equipmentConfig} /> },
       { key: 'equipmentTypes', path: '/masterdata/equipment-types', element: <EquipmentTypesPage /> },
+      { key: 'layout', path: '/masterdata/layout', element: <LayoutPage key="layout" /> },
       { key: 'import', path: '/masterdata/import', permission: 'MASTERDATA_EDIT', element: <ImportPage /> },
       { key: 'validation', path: '/masterdata/validation', element: <ValidationPage /> },
     ],

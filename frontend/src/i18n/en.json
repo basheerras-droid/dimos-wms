@@ -56,7 +56,8 @@
     "import": "Import",
     "validation": "Check configuration",
     "users": "Users",
-    "auditLog": "Audit log"
+    "auditLog": "Audit log",
+    "layout": "Layout preview"
   },
   "user": {
     "menu": "User menu",
@@ -368,6 +369,50 @@
       "truncated": "Showing the first {{shown}} of {{count}}.",
       "openRecord": "Open record",
       "wholePlant": "Whole plant"
+    },
+    "layout": {
+      "title": "Layout preview",
+      "intro": "The plant as a picture, built from the locations and links in the master data. Look only - to change something, click a location and open its record.",
+      "tabPlan": "Plan view",
+      "tabRack": "Rack face",
+      "noLocations": "There are no locations yet. Create locations (with x / y positions) or import them first.",
+      "nothingOnLevel": "No location on this level has an x / y position, so there is nothing to draw. Add positions to the locations.",
+      "planCounts": "{{locations}} locations and {{links}} links on this level",
+      "withoutPosition": "{{count}} location(s) on this level have no x / y position and are not shown.",
+      "crossLevel": "{{count}} link(s) lead to or from another level (for example a hoist) and are not drawn on this plan.",
+      "planLabel": "Plan of the locations of one level",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fit": "Show everything",
+      "areasLegend": "Areas (click to hide or show):",
+      "planHelp": "Drag to move, mouse wheel or +/- to zoom. Zoom in to see the codes and the direction of the links. Click a location for details.",
+      "stateLabel": "State",
+      "position": "Position: x {{x}} mm, y {{y}} mm",
+      "openRecord": "Open record",
+      "state": {
+        "OK": "In use",
+        "DISABLED": "Disabled",
+        "BLOCKED_IN": "Blocked inbound",
+        "BLOCKED_OUT": "Blocked outbound",
+        "BLOCKED_BOTH": "Blocked both ways"
+      },
+      "noRacks": "No racks found. A rack is a group of locations with an aisle and a column number.",
+      "rack": "Aisle and side",
+      "rackItem": "Aisle {{aisle}}, side {{side}} ({{count}} locations)",
+      "rackLabel": "Front of rack: aisle {{aisle}}, side {{side}}",
+      "fillTitle": "Fill level",
+      "usable": "{{usable}} of {{total}} locations are usable (enabled and not blocked)",
+      "occupied": "{{occupied}} of {{capacity}} locations occupied",
+      "occupancyLater": "Occupancy by stock is shown once the inventory is connected.",
+      "sumTotal": "{{count}} locations",
+      "sumDisabled": "{{count}} disabled",
+      "sumBlocked": "{{count}} blocked",
+      "sumRange": "Columns {{c1}} - {{c2}}, levels {{l1}} - {{l2}}",
+      "duplicates": "{{count}} location(s) share a column and level with another location in this aisle side (outlined in purple). Check the column and level numbers.",
+      "unplaced": "{{count}} location(s) of this aisle side have no column number and are not shown.",
+      "dupCell": "more than one location in this cell",
+      "cellPosition": "Column {{column}}, level {{level}}",
+      "rackHelp": "Columns run left to right, levels bottom to top. Click a cell to see the location."
     }
   },
   "placeholder": {

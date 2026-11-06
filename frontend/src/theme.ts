@@ -28,13 +28,50 @@ export interface NavPalette {
   accent: string
 }
 
+/**
+ * Colours of the layout preview. States are never told by colour alone: disabled is hatched / hollow, blocked has a
+ * ring and a cross (plan) or stripes / cross-hatch (rack face), and the legend names every one of them.
+ */
+export interface LayoutPalette {
+  /** One colour per area, handed out in order (repeats after 8). */
+  areas: string[]
+  ok: string
+  disabled: string
+  disabledLine: string
+  blockedIn: string
+  blockedOut: string
+  blockedBoth: string
+  empty: string
+  link: string
+  linkDisabled: string
+  selected: string
+  conflict: string
+}
+
 declare module '@mui/material/styles' {
   interface Palette {
     nav: NavPalette
+    layout: LayoutPalette
   }
   interface PaletteOptions {
     nav?: NavPalette
+    layout?: LayoutPalette
   }
+}
+
+const layout: LayoutPalette = {
+  areas: ['#2F6DB5', '#2E8B8B', '#7A5CB5', '#B5732F', '#5C8A2F', '#B52F7A', '#6B7A8F', '#8F6B2F'],
+  ok: '#3D8F5F',
+  disabled: '#D5D9DC',
+  disabledLine: '#7C858A',
+  blockedIn: brand.blutorange,
+  blockedOut: '#B57A0F',
+  blockedBoth: '#7A1703',
+  empty: '#EEF0F1',
+  link: '#8A9196',
+  linkDisabled: '#C5CACD',
+  selected: brand.schwarzgrau,
+  conflict: '#B52F7A',
 }
 
 const nav: NavPalette = {
@@ -51,6 +88,7 @@ const nav: NavPalette = {
 export const theme = createTheme({
   palette: {
     nav,
+    layout,
     primary: { main: brand.blutorange, contrastText: brand.white },
     secondary: { main: brand.schwarzgrau, contrastText: brand.white },
     text: { primary: brand.text, secondary: brand.fenstergrau },
