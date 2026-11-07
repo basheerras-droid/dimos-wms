@@ -50,9 +50,10 @@ export default function AppShell() {
   const width = compact ? WIDE : collapsed ? NARROW : WIDE
   const showText = compact || !collapsed
 
-  const has = (permission?: string) => !permission || user.permissions.includes(permission)
+  const has = (permission?: string, role?: string) =>
+    (!permission || user.permissions.includes(permission)) && (!role || user.roles.includes(role))
   const allowed = (item: NavItem): boolean =>
-    item.children ? has(item.permission) && item.children.some((c) => has(c.permission)) : has(item.permission)
+    item.children ? has(item.permission) && item.children.some((c) => has(c.permission, c.role)) : has(item.permission, item.role)
   const isOn = (path: string) => (path === '/' ? location.pathname === '/' : location.pathname.startsWith(path))
 
   const renderItem = (item: NavItem, depth: number) => {

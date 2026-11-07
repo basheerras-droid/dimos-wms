@@ -1,0 +1,4 @@
+code,name,description,enabled,roles
+DEMO-OPERATORS,Demo operators,Day-to-day operation of the demo plant,TRUE,OPERATOR
+DEMO-SUPERVISORS,Demo supervisors,Supervise the demo plant and maintain its master data,TRUE,OPERATOR;ADMIN
+DEMO-VIEWERS,Demo viewers,"Read-only access, e.g. for visitors",TRUE,VIEWER

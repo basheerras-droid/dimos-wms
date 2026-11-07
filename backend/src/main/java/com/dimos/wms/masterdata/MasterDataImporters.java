@@ -444,7 +444,7 @@ class MasterDataImporters {
         }
         R before = service.get(id, run.who);
         R after = service.update(id, request, run.who);
-        return before.equals(after) ? Status.UNCHANGED : Status.UPDATE;
+        return MasterDataService.sameValues(before, after) ? Status.UNCHANGED : Status.UPDATE;
     }
 
     /** Applies the same field rules as the web forms (the services themselves only check business rules). */

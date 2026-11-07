@@ -19,6 +19,7 @@ import EntityPage from './masterdata/EntityPage'
 import EquipmentTypesPage from './masterdata/EquipmentTypesPage'
 import LayoutPage from './layout/LayoutPage'
 import ImportPage from './masterdata/ImportPage'
+import ProjectDataPage from './masterdata/ProjectDataPage'
 import ValidationPage from './masterdata/ValidationPage'
 import {
   areasConfig, equipmentConfig, huTypesConfig, locationLinksConfig, locationsConfig, locationTypesConfig,
@@ -31,6 +32,8 @@ export interface NavItem {
   icon?: ReactElement
   /** Needed to see this entry. The server checks again on every call. */
   permission?: string
+  /** Needed role (e.g. SUPER_ADMIN) in addition to the permission. The server checks again on every call. */
+  role?: string
   children?: NavItem[]
   /** The page; entries without one show the "planned for a later release" page. */
   element?: ReactElement
@@ -59,6 +62,7 @@ export const navItems: NavItem[] = [
       { key: 'layout', path: '/masterdata/layout', element: <LayoutPage key="layout" /> },
       { key: 'import', path: '/masterdata/import', permission: 'MASTERDATA_EDIT', element: <ImportPage /> },
       { key: 'validation', path: '/masterdata/validation', element: <ValidationPage /> },
+      { key: 'projectData', path: '/masterdata/project-data', permission: 'MASTERDATA_EDIT', role: 'SUPER_ADMIN', element: <ProjectDataPage /> },
     ],
   },
   { key: 'reports', path: '/reports', icon: <AssessmentIcon /> },

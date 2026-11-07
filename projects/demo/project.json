@@ -1,0 +1,20 @@
+{
+  "code": "demo",
+  "name": "Demo plant",
+  "description": "A generic demonstration plant invented by DIMOS (no customer data): inbound conveyor line, 3 high-bay aisles of 74 columns x 12 levels x 2 sides (5,328 bins, the size of the INL high bay), stacker cranes, a 3-level hoist, 2 outbound stations, an AGV path, handling-unit types with nesting, demo user groups, workstation groups, workstations and parameter overrides.",
+  "files": [
+    { "type": "areas", "file": "areas.csv" },
+    { "type": "location-types", "file": "location-types.csv" },
+    { "type": "hu-types", "file": "hu-types.csv" },
+    { "type": "locations", "file": "locations.csv" },
+    { "type": "equipment", "file": "equipment.csv" },
+    { "type": "location-links", "file": "location-links.csv" },
+    { "type": "equipment-locations", "file": "equipment-locations.csv" },
+    { "type": "location-type-hu-types", "file": "location-type-hu-types.csv" },
+    { "type": "hu-type-nesting", "file": "hu-type-nesting.csv" },
+    { "type": "user-groups", "file": "user-groups.csv" },
+    { "type": "workstation-groups", "file": "workstation-groups.csv" },
+    { "type": "workstations", "file": "workstations.csv" },
+    { "type": "parameters", "file": "parameters.csv" }
+  ]
+}

@@ -1,0 +1,6 @@
+code,name,type,location_code,workstation_group_code,host_name,ip_address,check_ip,default_printer,enabled
+WS-OFFICE-01,Office PC 1,PC,,WSG-OFFICE,,,FALSE,,TRUE
+WS-IN-01,Inbound terminal,HMI,IN-01,WSG-FLOOR,,,FALSE,,TRUE
+WS-OUT-01,Outbound station 1 terminal,HMI,OUT-01,WSG-FLOOR,,,FALSE,,TRUE
+WS-OUT-02,Outbound station 2 terminal,HMI,OUT-02,WSG-FLOOR,,,FALSE,,TRUE
+WS-HH-01,Handheld scanner 1,HANDHELD,,WSG-FLOOR,,,FALSE,,TRUE

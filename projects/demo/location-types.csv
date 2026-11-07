@@ -1,0 +1,8 @@
+code,name,is_storage,is_transfer,is_workstation,capacity_hu
+RACK_BIN,Rack bin,TRUE,FALSE,FALSE,1
+CONV_POS,Conveyor position,FALSE,FALSE,FALSE,1
+TRANSFER,Transfer position,FALSE,TRUE,FALSE,1
+CRANE_PD,Stacker crane pick-up / drop-off,FALSE,TRUE,FALSE,1
+HOIST_STOP,Hoist stop,FALSE,TRUE,FALSE,1
+STATION,Outbound station,FALSE,FALSE,TRUE,1
+AGV_NODE,AGV path point,FALSE,TRUE,FALSE,1

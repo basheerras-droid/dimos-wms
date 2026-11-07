@@ -1,0 +1,5 @@
+inner_hu_type_code,outer_hu_type_code,max_qty
+BIN,PALLET,24
+BIN,CART,6
+BIN,ULD,40
+PALLET,ULD,2

@@ -1,0 +1,4 @@
+code,name,area_type
+INBOUND,Inbound,INBOUND
+STORAGE,High-bay storage,STORAGE
+OUTBOUND,Outbound,OUTBOUND

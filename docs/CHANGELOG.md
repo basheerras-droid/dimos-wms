@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-11-07
+- Step E6.1 (import speed): the import session is flushed and emptied every 100 rows and the audit rows of a file are written
+  in one batch (`AuditService.recordAll`), so large files no longer slow down row by row. 5,000 locations + 10,000 links:
+  several minutes before, now seconds to about one minute depending on machine load (numbers in `docs/test-evidence/STEP-E.md`).
+  New `ImportTimingTests`. A re-import of an unchanged file now really reports "unchanged" for rows with decimal numbers
+  (1000 and 1000.000 are the same value; before, such rows got a new version and an audit row every time).
+- Step E6.2 (project data): new module `project`. A project data set is a folder with `project.json` and CSV files
+  (master data, user groups, workstation groups, workstations, parameter overrides). `projects/demo/` is a generic demo plant
+  (3 areas, inbound line, 3 aisles x 74 columns x 12 levels x 2 sides = 5,328 bins, stacker cranes, 3-level hoist, 2 outbound
+  stations, AGV path, HU types with nesting, demo groups, workstations); `projects/README.md` explains the format. Customer data
+  is read from the server folder `wms.projects.dir` and never goes into Git.
+  Screen *Master data > Project data* (SUPER_ADMIN only): **Check** does the whole load and rolls it back; modes
+  **Replace master data** (deletes all master data first, keeps users, roles, permissions, user groups, workstation groups,
+  parameters, audit log and site; workstations are kept and their location reference cleared; shows what will be deleted
+  and needs the project name typed) and **Add / update** (nothing deleted). One transaction: all or nothing. One `PROJECT_LOAD`
+  audit entry with the counts deleted and loaded. Command line: `--wms.project-load.code=demo` (dry run unless
+  `--wms.project-load.dry-run=false`).
+
 ## 2026-11-06
 - `deploy/backup-wms.ps1`: daily pg_dump (custom format) of `wms_dev` with a pgpass file, dated folders, readability check,
   retention (`-KeepDays`, default 14), log, exit code 1 on failure. `deploy/README.md` section 6: Task Scheduler setup on

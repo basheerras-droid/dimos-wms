@@ -1,0 +1,11 @@
+code,name,equipment_type_code,area_code
+CONV-IN,Inbound conveyor,CONVEYOR,INBOUND
+XFER-1,Distribution transfer unit,TRANSFER,INBOUND
+SC-A01,Stacker crane aisle A01,STACKER_CRANE,STORAGE
+SC-A02,Stacker crane aisle A02,STACKER_CRANE,STORAGE
+SC-A03,Stacker crane aisle A03,STACKER_CRANE,STORAGE
+CONV-OUT,Outbound conveyor,CONVEYOR,OUTBOUND
+HOIST-1,Hoist 1 (levels 1 to 3),HOIST,OUTBOUND
+STN-1,Outbound station 1,STATION,OUTBOUND
+STN-2,Outbound station 2,STATION,OUTBOUND
+AGV-1,AGV 1,AGV,OUTBOUND

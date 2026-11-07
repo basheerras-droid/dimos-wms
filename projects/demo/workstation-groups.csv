@@ -1,0 +1,3 @@
+code,name,description,enabled,allowed_permissions
+WSG-OFFICE,Office PCs,Office computers: everything a user is entitled to,TRUE,DASHBOARD_VIEW;MASTERDATA_VIEW;MASTERDATA_EDIT;USER_MANAGE;AUDIT_VIEW;ROLE_MANAGE;WORKSTATION_MANAGE;PARAMETER_VIEW;PARAMETER_EDIT
+WSG-FLOOR,Floor terminals,Terminals and handhelds in the plant: operation only,TRUE,DASHBOARD_VIEW;MASTERDATA_VIEW

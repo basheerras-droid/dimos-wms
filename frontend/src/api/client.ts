@@ -57,7 +57,10 @@ function writeHeaders(headers: Record<string, string>, method: string) {
   }
 }
 
-export async function api<T>(path: string, options: { method?: string; body?: unknown } = {}): Promise<T> {
+export async function api<T>(
+  path: string,
+  options: { method?: string; body?: unknown; acceptStatus?: number[] } = {},
+): Promise<T> {
   const method = options.method ?? 'GET'
   const headers: Record<string, string> = { Accept: 'application/json' }
   if (options.body !== undefined) headers['Content-Type'] = 'application/json'
@@ -70,7 +73,7 @@ export async function api<T>(path: string, options: { method?: string; body?: un
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
   })
 
-  if (!response.ok) throw await toApiError(response)
+  if (!response.ok && !options.acceptStatus?.includes(response.status)) throw await toApiError(response)
   if (response.status === 204) return undefined as T
   return (await response.json()) as T
 }

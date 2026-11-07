@@ -155,6 +155,20 @@
 	</dependencyManagement>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<!-- the project data sets that ship with the product (e.g. the demo plant) are loaded from inside the JAR -->
+			<resource>
+				<directory>${project.basedir}/../projects</directory>
+				<targetPath>projects</targetPath>
+				<includes>
+					<include>*/project.json</include>
+					<include>*/*.csv</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<!-- Writes git.properties (branch, short commit id, commit time, dirty flag) - nothing personal. -->

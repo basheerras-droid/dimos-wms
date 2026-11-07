@@ -1,0 +1,3 @@
+parameter,scope,scope_code,value
+security.session_timeout,WS_GROUP,WSG-FLOOR,PT8H
+security.session_timeout,WORKSTATION,WS-HH-01,PT2H

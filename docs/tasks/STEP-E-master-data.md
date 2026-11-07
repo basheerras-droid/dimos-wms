@@ -117,6 +117,7 @@ Tests: inheritance via group; a workstation restriction blocks MASTERDATA_EDIT a
 parameter override order; a built-in role cannot be changed.
 
 ## E6 - Demo project data (product/project separation)
+Status 2026-11-07: built (projects/demo, screen Master data > Project data, command line, timing). Owner changed the load to Replace/Add-update modes.
 - Create folder `projects/demo/masterdata/` with CSV files for a small generic demo plant (no customer data):
   1 site, areas INBOUND / STORAGE / OUTBOUND, an inbound conveyor line of 6 locations, one hoist serving 3 levels,
   a small rack (2 aisles x 2 sides x 5 columns x 3 levels), 2 outbound stations, an AGV path joining them,

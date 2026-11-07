@@ -34,7 +34,7 @@ export default function App() {
                     key={n.key}
                     path={n.path}
                     element={
-                      <RequirePermission permission={n.permission}>
+                      <RequirePermission permission={n.permission} role={n.role}>
                         {n.element ?? <PlaceholderPage navKey={n.key} />}
                       </RequirePermission>
                     }

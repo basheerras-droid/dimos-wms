@@ -1,0 +1,5 @@
+code,name,length_mm,width_mm,height_mm,tare_kg,max_gross_kg,is_container
+PALLET,Pallet 1200 x 800,1200,800,144,25,1000,TRUE
+ULD,Air cargo container (PMC pallet),3175,2438,1626,120,6800,TRUE
+CART,Cart / trolley,1200,800,1700,60,500,TRUE
+BIN,Plastic bin 600 x 400,600,400,320,2,50,FALSE

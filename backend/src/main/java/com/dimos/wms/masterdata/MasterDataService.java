@@ -110,6 +110,29 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
         return after;
     }
 
+    /** Equal field by field; numbers compare by value (1000 = 1000.000), so a re-import of the same file is "unchanged". */
+    static boolean sameValues(Object a, Object b) {
+        if (a == null || b == null || !a.getClass().isRecord() || a.getClass() != b.getClass()) {
+            return java.util.Objects.equals(a, b);
+        }
+        try {
+            for (java.lang.reflect.RecordComponent c : a.getClass().getRecordComponents()) {
+                java.lang.reflect.Method m = c.getAccessor();
+                m.setAccessible(true);
+                Object x = m.invoke(a);
+                Object y = m.invoke(b);
+                boolean same = x instanceof java.math.BigDecimal bx && y instanceof java.math.BigDecimal by
+                        ? bx.compareTo(by) == 0 : java.util.Objects.equals(x, y);
+                if (!same) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (ReflectiveOperationException ex) {
+            return a.equals(b);
+        }
+    }
+
     @Transactional
     public R update(Long id, Q request, WmsUserPrincipal who) {
         E entity = load(id, who);
@@ -121,7 +144,7 @@ abstract class MasterDataService<E extends SiteEntity, Q extends VersionedReques
         }
         R before = toResponse(entity);
         apply(entity, request, who);
-        if (toResponse(entity).equals(before)) {
+        if (sameValues(toResponse(entity), before)) {
             return before; // nothing really changed: no new version, no audit row
         }
         entity.stamp(who.username());

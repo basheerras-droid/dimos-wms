@@ -9,7 +9,10 @@ export default function GroupRedirect({ group }: { group: string }) {
   const { t } = useTranslation()
   const me = useMe()
   const permissions = me.data?.permissions ?? []
-  const first = navItems.find((i) => i.key === group)?.children?.find((c) => !c.permission || permissions.includes(c.permission))
+  const roles = me.data?.roles ?? []
+  const first = navItems.find((i) => i.key === group)?.children?.find(
+    (c) => (!c.permission || permissions.includes(c.permission)) && (!c.role || roles.includes(c.role)),
+  )
   if (!first?.path) return <Alert severity="warning">{t('md.error.forbidden')}</Alert>
   return <Navigate to={first.path} replace />
 }
