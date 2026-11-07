@@ -131,7 +131,7 @@ class ImportExportTests {
         assertThat(number(result, "$.created")).isEqualTo(2);
         assertThat((Boolean) JsonPath.read(result, "$.applied")).isFalse();
         assertThat(count("area")).isZero();
-        verify(audit, never()).record(any());
+        verify(audit, never()).recordAll(any());
     }
 
     @Test
@@ -139,8 +139,10 @@ class ImportExportTests {
         String applied = csvImport("areas", AREAS, false, 200);
         assertThat((Boolean) JsonPath.read(applied, "$.applied")).isTrue();
         assertThat(count("area")).isEqualTo(2);
-        verify(audit, times(2)).record(argThat((AuditEvent e) -> "CREATE".equals(e.action()) && "area".equals(e.entityType())));
-        verify(audit).record(argThat((AuditEvent e) -> "IMPORT".equals(e.action()) && e.detail().contains("2 created")));
+        org.mockito.ArgumentCaptor<java.util.List<AuditEvent>> captor = org.mockito.ArgumentCaptor.forClass(java.util.List.class);
+        verify(audit).recordAll(captor.capture());
+        assertThat(captor.getValue().stream().filter(e -> "CREATE".equals(e.action()) && "area".equals(e.entityType())).count()).isEqualTo(2);
+        assertThat(captor.getValue().stream().anyMatch(e -> "IMPORT".equals(e.action()) && e.detail().contains("2 created"))).isTrue();
 
         long versionBefore = jdbc.queryForObject("select version from area where code = 'ZT-INB'", Long.class);
         reset(audit);
@@ -184,7 +186,7 @@ class ImportExportTests {
         String refused = csvImport("locations", file, false, 422);
         assertThat((Boolean) JsonPath.read(refused, "$.applied")).isFalse();
         assertThat(count("location")).isZero(); // not even the two good rows
-        verify(audit, never()).record(any());
+        verify(audit, never()).recordAll(any());
     }
 
     @Test

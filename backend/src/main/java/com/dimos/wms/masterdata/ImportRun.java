@@ -17,12 +17,18 @@ final class ImportRun {
     record RowResult(int row, String key, Status status, String message) {
     }
 
+    /** After this many rows the session is flushed and emptied, so it never grows with the size of the file. */
+    static final int HOUSEKEEPING_EVERY = 100;
+
     final WmsUserPrincipal who;
     final List<RowResult> results = new ArrayList<>();
     private final Set<String> seenKeys = new HashSet<>();
+    private final Runnable housekeeping;
+    private int rowsDone;
 
-    ImportRun(WmsUserPrincipal who) {
+    ImportRun(WmsUserPrincipal who, Runnable housekeeping) {
         this.who = who;
+        this.housekeeping = housekeeping;
     }
 
     Long siteId() {
@@ -44,6 +50,9 @@ final class ImportRun {
                     ex.details.isEmpty() ? ex.getMessage() : String.join("; ", ex.details)));
         } catch (RuntimeException ex) {
             results.add(new RowResult(number, key, Status.ERROR, "unexpected problem: " + ex.getClass().getSimpleName()));
+        }
+        if (++rowsDone % HOUSEKEEPING_EVERY == 0) {
+            housekeeping.run();
         }
     }
 
